@@ -1,3 +1,6 @@
+// import { Configuration } from '@nuxt/types'
+// import colors from 'vuetify/es5/util/colors'
+
 const envPath = `../.env`
 require("dotenv").config({ path: envPath })
 const { NODE_ENV, API_BASE_URL } = process.env
@@ -31,7 +34,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: [{ src: "~/plugins/vue-apexchart.js", ssr: false }],
   typescript: {
     typeCheck: true,
     ignoreNotFoundWarnings: true
