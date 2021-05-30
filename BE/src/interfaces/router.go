@@ -3,14 +3,11 @@ package interfaces
 import (
 	"app/src/config"
 	"app/src/interfaces/controllers"
-	// "app/src/usecase"
 	"fmt"
 	"github.com/labstack/echo"
-	// "github.com/labstack/echo/middleware"
 	"log"
 	"net/http"
 )
-
 
 // Run start server
 func Run(e *echo.Echo, port string) {
@@ -21,13 +18,20 @@ func Run(e *echo.Echo, port string) {
 // Routes returns the initialized router
 func Routes(e *echo.Echo) {
 
+	// Health Check
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Good morning, Golang + Nuxt.js !")
 	})
 
-	t := e.Group("/ticker")
+	// api v1
+	apiV1 := e.Group("api/v1")
+	apiV1.GET("", func(c echo.Context) error {
+		return c.String(http.StatusOK, "api v1 status 200")
+	})
+
+	// ticker
+	t := apiV1.Group("/ticker")
 	t.GET("/past", func(c echo.Context) error {
-		// TODO: Groupの中に入れたい　何回も呼び出したくない
 		tickerController := controllers.NewTickerController()
 		return tickerController.Past(c)
 	})

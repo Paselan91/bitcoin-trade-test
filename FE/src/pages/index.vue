@@ -65,8 +65,8 @@ export default class Top extends Vue {
   password: string = "Password"
   rules: Array<any> = [
     {
-      required: value => !!value || "Required.",
-      min: v => v.length >= 8 || "Min 8 characters"
+      required: (value: any) => !!value || "Required.",
+      min: (v: any) => v.length >= 8 || "Min 8 characters"
     }
   ]
 
@@ -317,7 +317,7 @@ export default class Top extends Vue {
     }
   ]
 
-  public chartOptions = {
+  public chartOptions: any = {
     chart: {
       type: "candlestick",
       height: 350
