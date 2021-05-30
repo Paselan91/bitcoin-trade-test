@@ -6,7 +6,7 @@ attach app:
 attach db:
 	docker-compose exec mysql bash
 fmt:
-	docker exec -it bitflyer go fmt ./...
+	docker exec -it be go fmt ./...
 up:
 	docker-compose up
 up-d:

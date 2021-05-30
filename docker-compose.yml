@@ -28,6 +28,7 @@ services:
       - API_SECRET=$API_SECRET
       - PRODUCT_CODE=$PRODUCT_CODE
       - API_BASE_URL=$API_BASE_URL
+      - CRYPTOWATCH_URL=$CRYPTOWATCH_URL
     ports:
       - $BE_PORT:8000
     working_dir: /usr/src/app/BE
@@ -41,8 +42,6 @@ services:
     build:
       context: ./
       dockerfile: ./FE/Dockerfile
-    environment:
-      API_BASE_URL: $API_BASE_URL
     command: ['/bin/bash', '-c', 'NUXT_HOST=0.0.0.0 yarn run dev']
     working_dir: /usr/src/app/FE
     volumes:
@@ -50,4 +49,8 @@ services:
     ports:
       - $FE_PORT:3000
     environment:
+      TZ: Asia/Tokyo
+      API_BASE_URL: $API_BASE_URL
+    environment:
       - HOST=0.0.0.0
+      # - API_BASE_URL=$API_BASE_URL
