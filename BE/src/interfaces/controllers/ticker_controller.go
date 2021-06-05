@@ -29,6 +29,9 @@ func (t *TickerController) Past(c echo.Context) error {
 	beforeAfter := ohlcParams.BeforeAfter
 	unitTimeStamp := ohlcParams.Time
 
-	tickers, _ := tickerUsecase.FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp)
-	return c.JSON(http.StatusOK, tickers)
+	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, dataFlameCandles)
 }

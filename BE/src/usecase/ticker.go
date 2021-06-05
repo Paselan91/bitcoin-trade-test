@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/json"
+	"log"
 )
 
 type TickerUsecase struct{}
@@ -10,19 +11,25 @@ func NewTickerUsecase() *TickerUsecase {
 	return &TickerUsecase{}
 }
 
-// type DataFrameCandle struct {
-// 	Candles     []Candle      `json:"candles"`
-// 	Smas        []Sma         `json:"smas,omitempty"`
-// }
+type DataFrameCandle struct {
+	Candles CwCandles `json:"candles"`
+	Smas    []Sma     `json:"smas,omitempty"`
+}
 
-// type Sma struct {
-// 	Period int       `json:"period,omitempty"`
-// 	Values []float64 `json:"values,omitempty"`
-// }
+type Sma struct {
+	Period int       `json:"period,omitempty"`
+	Values []float64 `json:"values,omitempty"`
+}
 
-func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp string) (*CwCandles, error) {
+func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp string) (*DataFrameCandle, error) {
 	apiClient := New("", "")
-	return apiClient.FetchCwCandles(periods, beforeAfter, unitTimeStamp)
+	cwCandles, err := apiClient.FetchCwCandles(periods, beforeAfter, unitTimeStamp)
+	if err != nil {
+		log.Println(err)
+	}
+	var df DataFrameCandle
+	df.Candles = *cwCandles
+	return &df, err
 }
 
 /*
@@ -45,6 +52,7 @@ func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStam
 	259200 3d
 	604800 1w
 */
+
 type CwCandles struct {
 	Result struct {
 		Num60     [][]float64 `json:"60"`
