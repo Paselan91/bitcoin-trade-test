@@ -10,9 +10,19 @@ func NewTickerUsecase() *TickerUsecase {
 	return &TickerUsecase{}
 }
 
-func (t *TickerUsecase) TestCryptowatch(periods, beforeAfter, unitTimeStamp string) (*Cryptowatch, error) {
+// type DataFrameCandle struct {
+// 	Candles     []Candle      `json:"candles"`
+// 	Smas        []Sma         `json:"smas,omitempty"`
+// }
+
+// type Sma struct {
+// 	Period int       `json:"period,omitempty"`
+// 	Values []float64 `json:"values,omitempty"`
+// }
+
+func (t *TickerUsecase) FetchDataFlemeCandles(periods, beforeAfter, unitTimeStamp string) (*CwCandles, error) {
 	apiClient := New("", "")
-	return apiClient.GetCryptowatchTest(periods, beforeAfter, unitTimeStamp)
+	return apiClient.FetchCwCandles(periods, beforeAfter, unitTimeStamp)
 }
 
 /*
@@ -35,7 +45,7 @@ func (t *TickerUsecase) TestCryptowatch(periods, beforeAfter, unitTimeStamp stri
 	259200 3d
 	604800 1w
 */
-type Cryptowatch struct {
+type CwCandles struct {
 	Result struct {
 		Num60     [][]float64 `json:"60"`
 		Num180    [][]float64 `json:"180"`
@@ -53,11 +63,11 @@ type Cryptowatch struct {
 	} `json:"result"`
 }
 
-func (api *APIClient) GetCryptowatchTest(
+func (api *APIClient) FetchCwCandles(
 	periods string,
 	beforeAfter string,
 	time string,
-) (*Cryptowatch, error) {
+) (*CwCandles, error) {
 	url := ""
 	resp, err := api.doRequest(
 		"GET",
@@ -71,10 +81,10 @@ func (api *APIClient) GetCryptowatchTest(
 	if err != nil {
 		return nil, err
 	}
-	var cryptowatch Cryptowatch
-	err = json.Unmarshal(resp, &cryptowatch)
+	var cwCandles CwCandles
+	err = json.Unmarshal(resp, &cwCandles)
 	if err != nil {
 		return nil, err
 	}
-	return &cryptowatch, nil
+	return &cwCandles, nil
 }

@@ -29,6 +29,6 @@ func (t *TickerController) Past(c echo.Context) error {
 	beforeAfter := ohlcParams.BeforeAfter
 	unitTimeStamp := ohlcParams.Time
 
-	tickers, _ := tickerUsecase.TestCryptowatch(periods, beforeAfter, unitTimeStamp)
+	tickers, _ := tickerUsecase.FetchDataFlemeCandles(periods, beforeAfter, unitTimeStamp)
 	return c.JSON(http.StatusOK, tickers)
 }
