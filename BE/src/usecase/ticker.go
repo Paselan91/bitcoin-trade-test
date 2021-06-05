@@ -20,7 +20,7 @@ func NewTickerUsecase() *TickerUsecase {
 // 	Values []float64 `json:"values,omitempty"`
 // }
 
-func (t *TickerUsecase) FetchDataFlemeCandles(periods, beforeAfter, unitTimeStamp string) (*CwCandles, error) {
+func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp string) (*CwCandles, error) {
 	apiClient := New("", "")
 	return apiClient.FetchCwCandles(periods, beforeAfter, unitTimeStamp)
 }
