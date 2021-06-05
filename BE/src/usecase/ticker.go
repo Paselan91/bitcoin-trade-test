@@ -1,9 +1,9 @@
 package usecase
 
 import (
+	"app/src/domain/models"
 	"encoding/json"
 	"log"
-	"app/src/domain/models"
 )
 
 type TickerUsecase struct{}
