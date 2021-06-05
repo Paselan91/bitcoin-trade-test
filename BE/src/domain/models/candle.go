@@ -2,7 +2,9 @@ package models
 
 import (
 	// "github.com/markcheno/go-talib"
-	"time"
+	// "time"
+	"encoding/json"
+	// "log"
 )
 
 /*
@@ -56,12 +58,37 @@ type CwCandles struct {
 }
 
 type Candle struct {
-	Duration    time.Duration `json:"duration"`
-	Closetime   float64       `json:"close_time"`
-	Open        float64       `json:"open"`
-	High        float64       `json:"high"`
-	Low         float64       `json:"low"`
-	Close       float64       `json:"close"`
-	Volume      float64       `json:"volume"`
-	Quotevolume float64       `json:"quote_volume"`
+	Period      string  `json:"period"`
+	Closetime   float64 `json:"close_time"`
+	Open        float64 `json:"open"`
+	High        float64 `json:"high"`
+	Low         float64 `json:"low"`
+	Close       float64 `json:"close"`
+	Volume      float64 `json:"volume"`
+	Quotevolume float64 `json:"quote_volume"`
+}
+
+func (cwCandles *CwCandles) ConvertCwCandlesToCandles(period string) []Candle {
+
+	jsonCwCandles, _ := json.Marshal(cwCandles.Result)
+	var tmpCwCandles map[string][]interface{}
+	_ = json.Unmarshal(jsonCwCandles, &tmpCwCandles)
+
+	jsonCwOhlcs, _ := json.Marshal(tmpCwCandles[period])
+	var tmpCandles [][]float64
+	_ = json.Unmarshal(jsonCwOhlcs, &tmpCandles)
+
+	candles := make([]Candle, len(tmpCandles))
+	for i, tmpCandle := range tmpCandles {
+		candles[i].Period = period
+		candles[i].Closetime = tmpCandle[0]
+		candles[i].Open = tmpCandle[1]
+		candles[i].High = tmpCandle[2]
+		candles[i].Low = tmpCandle[3]
+		candles[i].Close = tmpCandle[4]
+		candles[i].Volume = tmpCandle[5]
+		candles[i].Quotevolume = tmpCandle[6]
+	}
+
+	return candles
 }

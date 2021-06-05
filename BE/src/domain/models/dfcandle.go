@@ -1,13 +1,18 @@
 package models
 
 import (
-	// "github.com/markcheno/go-talib"
-	// "time"
+// "github.com/markcheno/go-talib"
+// "time"
 )
 
+// type DataFrameCandle struct {
+// 	Candles CwCandles `json:"candles"`
+// 	Smas    []Sma     `json:"smas,omitempty"`
+// }
+
 type DataFrameCandle struct {
-	Candles CwCandles `json:"candles"`
-	Smas    []Sma     `json:"smas,omitempty"`
+	Candles []Candle `json:"candles"`
+	Smas    []Sma    `json:"smas,omitempty"`
 }
 
 type Sma struct {

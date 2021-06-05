@@ -261,7 +261,8 @@ export default class GenericChart extends Vue {
         if (res.status === 200) {
           console.log("response")
           console.log(res.data)
-          data = res.data.candles.result[this.selectedPeriods.value]
+          // data = res.data.candles.result[this.selectedPeriods.value]
+          data = res.data.candles
 
           /**
            *  Response
@@ -278,8 +279,8 @@ export default class GenericChart extends Vue {
            *  ]
            **/
           const chartData: any = data.map(value => ({
-            x: new Date(value[0] * 1000),
-            y: [value[1], value[2], value[3], value[4]]
+            x: new Date(value.close_time * 1000),
+            y: [value.open, value.high, value.low, value.close]
           }))
 
           this.series = [

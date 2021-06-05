@@ -18,8 +18,10 @@ func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStam
 	if err != nil {
 		log.Println(err)
 	}
+	candles := cwCandles.ConvertCwCandlesToCandles(periods)
+
 	var df models.DataFrameCandle
-	df.Candles = *cwCandles
+	df.Candles = candles
 	return &df, err
 }
 
