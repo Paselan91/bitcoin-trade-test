@@ -2,6 +2,7 @@
 <!-- <template>
   <div></div>
 </template> -->
+
 <template>
   <div>
     <v-container class="grey lighten-5 text-center">
@@ -120,8 +121,7 @@ import axios from "axios"
 @Component({})
 export default class GenericChart extends Vue {
   isLoading: Boolean = false
-  // url: string = "/api/v1"
-  url: string = "api/v1/ticker/past"
+  url: string = "api/v1/candles"
   beforeAfter: string = "after"
 
   // periodsに関する処理
@@ -225,7 +225,6 @@ export default class GenericChart extends Vue {
 
   async healthCheck() {
     await axios
-      // .get("http://docker.for.mac.localhost:8000/api/v1")
       .get(this.url)
       .then(res => {
         if (res.status === 200) {
@@ -262,7 +261,7 @@ export default class GenericChart extends Vue {
         if (res.status === 200) {
           console.log("response")
           console.log(res.data)
-          data = res.data.result[this.selectedPeriods.value]
+          data = res.data.candles.result[this.selectedPeriods.value]
 
           /**
            *  Response
