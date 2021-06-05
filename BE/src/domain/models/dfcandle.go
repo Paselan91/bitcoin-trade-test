@@ -36,13 +36,13 @@ type Sma struct {
 // 	return s
 // }
 
-// func (df *DataFrameCandle) Closes() []float64 {
-// 	s := make([]float64, len(df.Candles))
-// 	for i, candle := range df.Candles {
-// 		s[i] = candle.Close
-// 	}
-// 	return s
-// }
+func (df *DataFrameCandle) Closes() []float64 {
+	s := make([]float64, len(df.Candles))
+	for i, candle := range df.Candles {
+		s[i] = candle.Close
+	}
+	return s
+}
 
 // func (df *DataFrameCandle) Highs() []float64 {
 // 	s := make([]float64, len(df.Candles))
@@ -68,13 +68,13 @@ type Sma struct {
 // 	return s
 // }
 
-// func (df *DataFrameCandle) AddSma(period int) bool {
-// 	if len(df.Candles) > period {
-// 		df.Smas = append(df.Smas, Sma{
-// 			Period: period,
-// 			Values: talib.Sma(df.Closes(), period),
-// 		})
-// 		return true
-// 	}
-// 	return false
-// }
+func (df *DataFrameCandle) AddSma(period int) bool {
+	if len(df.Candles) > period {
+		df.Smas = append(df.Smas, Sma{
+			Period: period,
+			Values: talib.Sma(df.Closes(), period),
+		})
+		return true
+	}
+	return false
+}
