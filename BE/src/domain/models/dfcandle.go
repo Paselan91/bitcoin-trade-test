@@ -1,7 +1,7 @@
 package models
 
 import (
-// "github.com/markcheno/go-talib"
+"github.com/markcheno/go-talib"
 // "time"
 )
 

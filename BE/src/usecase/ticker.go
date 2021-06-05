@@ -22,6 +22,9 @@ func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStam
 
 	var df models.DataFrameCandle
 	df.Candles = candles
+	df.AddSma(7)
+	df.AddSma(14)
+	df.AddSma(25)
 	return &df, err
 }
 
