@@ -29,9 +29,9 @@ func Routes(e *echo.Echo) {
 		return c.String(http.StatusOK, "api v1 status 200")
 	})
 
-	// ticker
-	t := apiV1.Group("/ticker")
-	t.GET("/past", func(c echo.Context) error {
+	// candle
+	t := apiV1.Group("/candles")
+	t.GET("", func(c echo.Context) error {
 		tickerController := controllers.NewTickerController()
 		return tickerController.Past(c)
 	})

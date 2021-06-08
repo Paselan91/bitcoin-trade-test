@@ -2,6 +2,7 @@
 <!-- <template>
   <div></div>
 </template> -->
+
 <template>
   <div>
     <v-container class="grey lighten-5 text-center">
@@ -66,7 +67,17 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="3" offset="6">
+        <v-col cols="2">
+          <v-container class="px-0" fluid>
+            <v-checkbox v-model="isSmas" :label="`SMAS`"></v-checkbox>
+            <div v-if="isSmas">
+              <v-text-field v-model="sma1" label="SMA1" required></v-text-field>
+              <v-text-field v-model="sma2" label="SMA2" required></v-text-field>
+              <v-text-field v-model="sma3" label="SMA3" required></v-text-field>
+            </div>
+          </v-container>
+        </v-col>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -86,13 +97,23 @@
         <div v-if="isLoading" class="text-center">
           <v-progress-circular :size="50" indeterminate></v-progress-circular>
         </div>
-        <div v-else id="chart">
-          <apexchart
-            type="candlestick"
-            height="350"
-            :options="chartOptions"
-            :series="series"
-          ></apexchart>
+        <div v-else>
+          <div id="chart">
+            <apexchart
+              type="candlestick"
+              height="350"
+              :options="candlestickChartOptions"
+              :series="candlestickSeries"
+            ></apexchart>
+          </div>
+          <div id="chart">
+            <apexchart
+              type="line"
+              height="350"
+              :options="lineChartOptions"
+              :series="lineSeries"
+            ></apexchart>
+          </div>
         </div>
       </client-only>
     </v-container>
@@ -120,11 +141,13 @@ import axios from "axios"
 @Component({})
 export default class GenericChart extends Vue {
   isLoading: Boolean = false
-  // url: string = "/api/v1"
-  url: string = "api/v1/ticker/past"
-  beforeAfter: string = "after"
+  isSmas: Boolean = false
+  sma1: number = 7
+  sma2: number = 14
+  sma3: number = 21
 
-  // periodsに関する処理
+  url: string = "api/v1/candles"
+  beforeAfter: string = "after"
   periods: Array<object> = [
     { label: "1m", value: 60 },
     { label: "3m", value: 180 },
@@ -150,24 +173,6 @@ export default class GenericChart extends Vue {
     return this.formatDate(this.date)
   }
 
-  // TODO: デバッグ用
-  checkParamerters() {
-    console.log("checkParamerters")
-    console.log("selected periods ")
-    console.log(this.selectedPeriods.value)
-    console.log("beforeAfter " + this.beforeAfter)
-    console.log("date " + this.date)
-    const unixtimestamp = Math.floor(Date.parse(this.date) / 1000)
-    console.log("unixtimestamp " + unixtimestamp)
-
-    const requestData = {
-      periods: this.selectedPeriods.value,
-      [this.beforeAfter]: unixtimestamp
-    }
-    console.log("requestData")
-    console.log(requestData)
-  }
-
   formatDate(date: any) {
     if (!date) return null
 
@@ -187,13 +192,13 @@ export default class GenericChart extends Vue {
     this.dateFormatted = this.formatDate(this.date)
   }
 
-  public series = [
+  public candlestickSeries = [
     {
       data: []
     }
   ]
 
-  public chartOptions: any = {
+  public candlestickChartOptions: any = {
     chart: {
       type: "candlestick",
       height: 350
@@ -216,6 +221,55 @@ export default class GenericChart extends Vue {
     }
   }
 
+  public lineSeries = [
+    {
+      name: "SMA1",
+      data: []
+    },
+    {
+      name: "SMA2",
+      data: []
+    },
+    {
+      name: "SMA3",
+      data: []
+    }
+  ]
+
+  public lineChartOptions: any = {
+    chart: {
+      height: 350,
+      type: "line",
+      zoom: {
+        enabled: true
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: "straight",
+      width: 1
+    },
+    title: {
+      text: "Product Trends by Month",
+      align: "left"
+    },
+    grid: {
+      row: {
+        colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+        opacity: 0.5
+      }
+    },
+    xaxis: {
+      categories: []
+    },
+    yaxis: {
+      min: 3500000,
+      max: 3700000
+    }
+  }
+
   // mounted() {
   //   const yesterday = new Date(this.today)
   //   yesterday.setDate(yesterday.getDate() - 1)
@@ -225,7 +279,6 @@ export default class GenericChart extends Vue {
 
   async healthCheck() {
     await axios
-      // .get("http://docker.for.mac.localhost:8000/api/v1")
       .get(this.url)
       .then(res => {
         if (res.status === 200) {
@@ -248,11 +301,32 @@ export default class GenericChart extends Vue {
 
     // FIXME: 変数名かえたい
     const unixtimestamp = Math.floor(Date.parse(this.date) / 1000)
+
     const requestData = {
       periods: this.selectedPeriods.value,
       beforeAfter: this.beforeAfter,
-      time: unixtimestamp
+      time: unixtimestamp,
+      smas: this.isSmas ? "1" : "", // FIXME:
+      ...(this.isSmas
+        ? {
+            sma1: this.sma1,
+            sma2: this.sma2,
+            sma3: this.sma3
+          }
+        : {})
+      // ...(this.isSmas
+      //   ? {
+      //       smas: {
+      //         sma1: this.sma1,
+      //         sma2: this.sma2,
+      //         sma3: this.sma3
+      //       }
+      //     }
+      //   : {})
     }
+    console.log("requestData")
+    console.log(requestData)
+
     // FIXME: anyに型をつける
     let data: Array<any>
 
@@ -262,7 +336,8 @@ export default class GenericChart extends Vue {
         if (res.status === 200) {
           console.log("response")
           console.log(res.data)
-          data = res.data.result[this.selectedPeriods.value]
+          // data = res.data.candles.result[this.selectedPeriods.value]
+          data = res.data.candles
 
           /**
            *  Response
@@ -279,29 +354,49 @@ export default class GenericChart extends Vue {
            *  ]
            **/
           const chartData: any = data.map(value => ({
-            x: new Date(value[0] * 1000),
-            y: [value[1], value[2], value[3], value[4]]
+            x: new Date(value.close_time * 1000),
+            y: [value.open, value.high, value.low, value.close]
           }))
 
-          this.series = [
+          this.candlestickSeries = [
             {
               data: chartData
             }
           ]
 
-          this.chartOptions.yaxis.max = Math.max(
+          const maxYaxis = Math.max(
             ...chartData.map((value: any) => value.y[1])
           )
-          this.chartOptions.yaxis.min = Math.min(
+          const minYaxis = Math.min(
             ...chartData.map((value: any) => value.y[2])
           )
+          const maxXaxis = Math.max(...chartData.map((value: any) => value.x))
+          const minXaxis = Math.min(...chartData.map((value: any) => value.x))
 
-          this.chartOptions.xaxis.maxHeight = Math.max(
-            ...chartData.map((value: any) => value.x)
-          )
-          this.chartOptions.xaxis.minHeight = Math.min(
-            ...chartData.map((value: any) => value.x)
-          )
+          this.candlestickChartOptions.yaxis.max = maxYaxis
+          this.candlestickChartOptions.yaxis.min = minYaxis
+          this.candlestickChartOptions.xaxis.maxHeight = maxXaxis
+          this.candlestickChartOptions.xaxis.minHeight = minXaxis
+
+          if (res.data.smas) {
+            const sma1: any = res.data.smas[0].values
+            const sma2: any = res.data.smas[1].values
+            const sma3: any = res.data.smas[2].values
+
+            this.lineSeries[0].data = [...sma1]
+            this.lineSeries[1].data = [...sma2]
+            this.lineSeries[2].data = [...sma3]
+
+            this.lineChartOptions.xaxis.categories = chartData.map(function(
+              item: any
+            ) {
+              return item.x
+            })
+            this.lineChartOptions.yaxis.max = maxYaxis
+            this.lineChartOptions.yaxis.min = minYaxis
+            console.log("this.lineSeries.data")
+            console.log(this.lineSeries[0].data)
+          }
         }
       })
       .catch(e => {
@@ -311,6 +406,12 @@ export default class GenericChart extends Vue {
       })
     this.isLoading = false
   }
+
+  // TODO: デバッグ用
+  // checkParamerters() {
+  //   console.log("requestData")
+  //   console.log(requestData)
+  // }
   // @Prop({ required: true, default: "bar" }) type: string
 }
 </script>
