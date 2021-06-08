@@ -12,7 +12,7 @@ func NewTickerUsecase() *TickerUsecase {
 	return &TickerUsecase{}
 }
 
-func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStamp string) (*models.DataFrameCandle, error) {
+func (t *TickerUsecase) FetchDataFlameCandles(periods string, beforeAfter string, unitTimeStamp string, isSma bool, smas []int) (*models.DataFrameCandle, error) {
 	apiClient := New("", "")
 	cwCandles, err := apiClient.FetchCwCandles(periods, beforeAfter, unitTimeStamp)
 	if err != nil {
@@ -22,9 +22,11 @@ func (t *TickerUsecase) FetchDataFlameCandles(periods, beforeAfter, unitTimeStam
 
 	var df models.DataFrameCandle
 	df.Candles = candles
-	df.AddSma(7)
-	df.AddSma(14)
-	df.AddSma(25)
+	if isSma {
+		df.AddSma(smas[0])
+		df.AddSma(smas[1])
+		df.AddSma(smas[2])
+	}
 	return &df, err
 }
 

@@ -1,12 +1,13 @@
 <!-- <template>
   <div>apex chart</div>
 </template> -->
+
 <template>
   <div>
     <div>
       <h1>Welcome</h1>
-      <nuxt-link to="/apex_chart_js_test">apex chart.js test</nuxt-link>
-      <nuxt-link to="/past_candle">past candle</nuxt-link>
+      <nuxt-link to="/combo_chart">combo chart</nuxt-link>
+      <nuxt-link to="/past_candle">past candle test</nuxt-link>
     </div>
     <v-card :loading="loading" class="mx-auto my-12" max-width="500">
       <template slot="progress">
