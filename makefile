@@ -7,6 +7,8 @@ attach db:
 	docker-compose exec mysql bash
 fmt:
 	docker exec -it be go fmt ./...
+lint:
+	docker exec -it fe yarn lint --fix .
 up:
 	docker-compose up
 up-d:
