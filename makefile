@@ -9,6 +9,9 @@ fmt:
 	docker exec -it be go fmt ./...
 lint:
 	docker exec -it fe yarn lint --fix .
+format:
+	docker exec -it fe yarn lint --fix .
+	docker exec -it be go fmt ./...
 up:
 	docker-compose up
 up-d:
