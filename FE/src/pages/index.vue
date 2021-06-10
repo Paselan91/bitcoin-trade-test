@@ -8,6 +8,7 @@
       <h1>Welcome</h1>
       <nuxt-link to="/combo_chart">combo chart</nuxt-link>
       <nuxt-link to="/past_candle">past candle test</nuxt-link>
+      <nuxt-link to="/candle_line_test">candle line test</nuxt-link>
     </div>
     <v-card :loading="loading" class="mx-auto my-12" max-width="500">
       <template slot="progress">
