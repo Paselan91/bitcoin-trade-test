@@ -459,9 +459,6 @@ export default class GenericChart extends Vue {
             ) {
               return item.x
             })
-
-            // this.lineChartOptions.yaxis.max = maxYaxis
-            // this.lineChartOptions.yaxis.min = minYaxis
           }
 
           if (res.data.emas) {
@@ -490,12 +487,6 @@ export default class GenericChart extends Vue {
           }
 
           if (res.data.bbands) {
-            console.log("res.data.bbands.up")
-            console.log(res.data.bbands.up)
-            console.log("res.data.bbands.mid")
-            console.log(res.data.bbands.mid)
-            console.log("res.data.bbands.down")
-            console.log(res.data.bbands.down)
             const up: any = res.data.bbands.up
             const mid: any = res.data.bbands.mid
             const down: any = res.data.bbands.down

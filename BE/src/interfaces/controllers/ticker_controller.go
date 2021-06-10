@@ -97,13 +97,6 @@ func (t *TickerController) Past(c echo.Context) error {
 		emas[2] = ema3
 	}
 
-	log.Println("BBandsStr")
-	log.Println(BBandsStr)
-	log.Println("candleParams.BBandsN")
-	log.Println(candleParams.BBandsN)
-	log.Println("candleParams.BBandsK")
-	log.Println(candleParams.BBandsK)
-
 	isBBands := false
 	var bbandsN, bbandsK int
 	if BBandsStr != "" {
@@ -134,9 +127,6 @@ func (t *TickerController) Past(c echo.Context) error {
 		bbandsN,
 		bbandsK,
 	)
-
-	log.Println("dataFlameCandles.BBands")
-	log.Println(dataFlameCandles.BBands)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
