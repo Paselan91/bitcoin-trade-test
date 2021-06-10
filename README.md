@@ -3,5 +3,4 @@
 - Golang
 - Nuxt.js
 - Docker
-- Vue-ApexChart.js 
-`https://apexcharts.com/docs/vue-charts/`
+- [Vue-ApexChart.js](https://apexcharts.com/docs/vue-charts/)
