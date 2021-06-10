@@ -17,8 +17,7 @@ func NewTickerController() *TickerController {
 	return &TickerController{}
 }
 
-// FIXME: smaはオブジェクトにしたい
-
+// FIXME: sma,emeaはオブジェクトにしたい
 type CandleParams struct {
 	Periods     string `json:"Periods"`
 	BeforeAfter string `json:"BeforeAfter"`
@@ -27,13 +26,11 @@ type CandleParams struct {
 	Sma1        string `json:"sma1"`
 	Sma2        string `json:"sma2"`
 	Sma3        string `json:"sma3"`
+	Emas        string `json:"emas"`
+	Ema1        string `json:"ema1"`
+	Ema2        string `json:"ema2"`
+	Ema3        string `json:"ema3"`
 }
-
-// type Smas struct {
-// 	Sma1 int `json:"sma1"`
-// 	Sma2 int `json:"sma2"`
-// 	Sma3 int `json:"sma3"`
-// }
 
 func (t *TickerController) Past(c echo.Context) error {
 	tickerUsecase := usecase.NewTickerUsecase()
@@ -42,49 +39,21 @@ func (t *TickerController) Past(c echo.Context) error {
 		// TODO: error handling
 	}
 
-	log.Println("candleParams")
-	log.Println(candleParams)
-	log.Println("---------- 0 -----------")
-	log.Println(candleParams.Smas)
-	log.Println("---------- 1 -----------")
-
-	log.Println(candleParams.Smas == "")
-	// log.Println(candleParams.Smas != "")
-	log.Println("---------- 2 -----------")
-
-	log.Println(candleParams.Sma1)
-	log.Println("---------- xx -----------")
-
-	log.Println(candleParams.Sma2)
-	log.Println(candleParams.Sma3)
-	log.Println("---------- 3 -----------")
-
-	// name := c.QueryParam("smas")
-	// log.Println("")
-	// log.Println("name type")
-	// log.Println(reflect.TypeOf(name))
-	// log.Println("")
-
 	periods := candleParams.Periods
 	beforeAfter := candleParams.BeforeAfter
 	unitTimeStamp := candleParams.Time
 	SmasStr := candleParams.Smas
-	log.Println("---------- 4 -----------")
+	EmasStr := candleParams.Emas
+
+	log.Println("EmasStr")
+	log.Println(EmasStr)
 
 	var isSmas bool
-	// var sma1 int
-	// var sma2 int
-	// var sma3 int
-	// var smas []int
 	smas := make([]int, 3)
 	if SmasStr != "" {
-		log.Println("---------- hi -----------")
 		sma1Str := candleParams.Sma1
 		sma2Str := candleParams.Sma2
 		sma3Str := candleParams.Sma3
-		// sma1 = candleParams.Sma1
-		// sma2 = candleParams.Sma2
-		// sma3 = candleParams.Sma3
 		isSmas = true
 		sma1, err := strconv.Atoi(sma1Str)
 		if sma1Str == "" || err != nil || sma1 < 0 {
@@ -102,10 +71,30 @@ func (t *TickerController) Past(c echo.Context) error {
 		smas[1] = sma2
 		smas[2] = sma3
 	}
-	log.Println("isSmas")
-	log.Println(isSmas)
-	log.Println("smas")
-	log.Println(smas)
+
+	var isEmas bool
+	emas := make([]int, 3)
+	if EmasStr != "" {
+		ema1Str := candleParams.Ema1
+		ema2Str := candleParams.Ema2
+		ema3Str := candleParams.Ema3
+		isEmas = true
+		ema1, err := strconv.Atoi(ema1Str)
+		if ema1Str == "" || err != nil || ema1 < 0 {
+			ema1 = 7
+		}
+		ema2, err := strconv.Atoi(ema2Str)
+		if ema2Str == "" || err != nil || ema2 < 0 {
+			ema2 = 14
+		}
+		ema3, err := strconv.Atoi(ema3Str)
+		if ema3Str == "" || err != nil || ema3 < 0 {
+			ema3 = 50
+		}
+		emas[0] = ema1
+		emas[1] = ema2
+		emas[2] = ema3
+	}
 
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
@@ -113,7 +102,13 @@ func (t *TickerController) Past(c echo.Context) error {
 		unitTimeStamp,
 		isSmas,
 		smas,
+		isEmas,
+		emas,
 	)
+
+	log.Println("dataFlameCandles")
+	log.Println(dataFlameCandles)
+
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

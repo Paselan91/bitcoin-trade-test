@@ -78,6 +78,16 @@
           </v-container>
         </v-col>
         <v-col cols="2">
+          <v-container class="px-0" fluid>
+            <v-checkbox v-model="isEmas" :label="`EMAS`"></v-checkbox>
+            <div v-if="isEmas">
+              <v-text-field v-model="ema1" label="EMA1" required></v-text-field>
+              <v-text-field v-model="ema2" label="EMA2" required></v-text-field>
+              <v-text-field v-model="ema3" label="EMA3" required></v-text-field>
+            </div>
+          </v-container>
+        </v-col>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -141,10 +151,16 @@ import axios from "axios"
 @Component({})
 export default class GenericChart extends Vue {
   isLoading: Boolean = false
+
   isSmas: Boolean = false
   sma1: number = 7
   sma2: number = 14
   sma3: number = 21
+
+  isEmas: Boolean = false
+  ema1: number = 7
+  ema2: number = 14
+  ema3: number = 21
 
   url: string = "api/v1/candles"
   beforeAfter: string = "after"
@@ -233,6 +249,18 @@ export default class GenericChart extends Vue {
     {
       name: "SMA3",
       data: []
+    },
+    {
+      name: "EMA1",
+      data: []
+    },
+    {
+      name: "EMA2",
+      data: []
+    },
+    {
+      name: "EMA3",
+      data: []
     }
   ]
 
@@ -265,8 +293,8 @@ export default class GenericChart extends Vue {
       categories: []
     },
     yaxis: {
-      min: 3500000,
-      max: 3700000
+      min: NaN,
+      max: NaN
     }
   }
 
@@ -282,8 +310,6 @@ export default class GenericChart extends Vue {
       .get(this.url)
       .then(res => {
         if (res.status === 200) {
-          // console.log("response")
-          // console.log(res.data)
           console.log("res")
           console.log(res)
         }
@@ -306,23 +332,22 @@ export default class GenericChart extends Vue {
       periods: this.selectedPeriods.value,
       beforeAfter: this.beforeAfter,
       time: unixtimestamp,
-      smas: this.isSmas ? "1" : "", // FIXME:
+      smas: this.isSmas ? "1" : "", // FIXME: 1
       ...(this.isSmas
         ? {
             sma1: this.sma1,
             sma2: this.sma2,
             sma3: this.sma3
           }
+        : {}),
+      emas: this.isEmas ? "1" : "", // FIXME: 1
+      ...(this.isSmas
+        ? {
+            ema1: this.ema1,
+            ema2: this.ema2,
+            ema3: this.ema3
+          }
         : {})
-      // ...(this.isSmas
-      //   ? {
-      //       smas: {
-      //         sma1: this.sma1,
-      //         sma2: this.sma2,
-      //         sma3: this.sma3
-      //       }
-      //     }
-      //   : {})
     }
     console.log("requestData")
     console.log(requestData)
@@ -394,8 +419,24 @@ export default class GenericChart extends Vue {
             })
             this.lineChartOptions.yaxis.max = maxYaxis
             this.lineChartOptions.yaxis.min = minYaxis
-            console.log("this.lineSeries.data")
-            console.log(this.lineSeries[0].data)
+          }
+
+          if (res.data.emas) {
+            const ema1: any = res.data.emas[0].values
+            const ema2: any = res.data.emas[1].values
+            const ema3: any = res.data.emas[2].values
+
+            this.lineSeries[3].data = [...ema1]
+            this.lineSeries[4].data = [...ema2]
+            this.lineSeries[5].data = [...ema3]
+
+            this.lineChartOptions.xaxis.categories = chartData.map(function(
+              item: any
+            ) {
+              return item.x
+            })
+            this.lineChartOptions.yaxis.max = maxYaxis
+            this.lineChartOptions.yaxis.min = minYaxis
           }
         }
       })
