@@ -88,6 +88,18 @@
           </v-container>
         </v-col>
         <v-col cols="2">
+          <v-container class="px-0" fluid>
+            <v-checkbox
+              v-model="isBBands"
+              :label="`Bolinger Bands`"
+            ></v-checkbox>
+            <div v-if="isBBands">
+              <v-text-field v-model="bbandsN" label="N" required></v-text-field>
+              <v-text-field v-model="bbandsK" label="K" required></v-text-field>
+            </div>
+          </v-container>
+        </v-col>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -161,6 +173,10 @@ export default class GenericChart extends Vue {
   ema1: number = 7
   ema2: number = 14
   ema3: number = 21
+
+  isBBands: Boolean = false
+  bbandsN: number = 20
+  bbandsK: number = 2
 
   url: string = "api/v1/candles"
   beforeAfter: string = "after"
@@ -261,6 +277,18 @@ export default class GenericChart extends Vue {
     {
       name: "EMA3",
       data: []
+    },
+    {
+      name: "BBands Up",
+      data: []
+    },
+    {
+      name: "BBands Middle",
+      data: []
+    },
+    {
+      name: "BBands Low",
+      data: []
     }
   ]
 
@@ -347,6 +375,13 @@ export default class GenericChart extends Vue {
             ema2: this.ema2,
             ema3: this.ema3
           }
+        : {}),
+      bbands: this.isBBands ? "1" : "", // FIXME: 1
+      ...(this.isBBands
+        ? {
+            bbandsN: this.bbandsN,
+            bbandsK: this.bbandsK
+          }
         : {})
     }
     console.log("requestData")
@@ -412,13 +447,21 @@ export default class GenericChart extends Vue {
             this.lineSeries[1].data = [...sma2]
             this.lineSeries[2].data = [...sma3]
 
+            const smaYMax = Math.max(...[...sma1, ...sma2, ...sma3])
+            const smaYMin = Math.min(...[...sma1, ...sma2, ...sma3])
+            this.lineChartOptions.yaxis.max =
+              smaYMax > maxYaxis ? smaYMax : maxYaxis
+            this.lineChartOptions.yaxis.min =
+              smaYMin < minYaxis ? smaYMin : maxYaxis
+
             this.lineChartOptions.xaxis.categories = chartData.map(function(
               item: any
             ) {
               return item.x
             })
-            this.lineChartOptions.yaxis.max = maxYaxis
-            this.lineChartOptions.yaxis.min = minYaxis
+
+            // this.lineChartOptions.yaxis.max = maxYaxis
+            // this.lineChartOptions.yaxis.min = minYaxis
           }
 
           if (res.data.emas) {
@@ -430,13 +473,51 @@ export default class GenericChart extends Vue {
             this.lineSeries[4].data = [...ema2]
             this.lineSeries[5].data = [...ema3]
 
-            this.lineChartOptions.xaxis.categories = chartData.map(function(
-              item: any
-            ) {
-              return item.x
-            })
-            this.lineChartOptions.yaxis.max = maxYaxis
-            this.lineChartOptions.yaxis.min = minYaxis
+            const emaYMax = Math.max(...[...ema1, ...ema2, ...ema3])
+            const emaYMin = Math.min(...[...ema1, ...ema2, ...ema3])
+            this.lineChartOptions.yaxis.max =
+              emaYMax > maxYaxis ? emaYMax : maxYaxis
+            this.lineChartOptions.yaxis.min =
+              emaYMin < minYaxis ? emaYMin : maxYaxis
+
+            if (this.lineChartOptions.xaxis.categories.length === 0) {
+              this.lineChartOptions.xaxis.categories = chartData.map(function(
+                item: any
+              ) {
+                return item.x
+              })
+            }
+          }
+
+          if (res.data.bbands) {
+            console.log("res.data.bbands.up")
+            console.log(res.data.bbands.up)
+            console.log("res.data.bbands.mid")
+            console.log(res.data.bbands.mid)
+            console.log("res.data.bbands.down")
+            console.log(res.data.bbands.down)
+            const up: any = res.data.bbands.up
+            const mid: any = res.data.bbands.mid
+            const down: any = res.data.bbands.down
+
+            this.lineSeries[6].data = [...up]
+            this.lineSeries[7].data = [...mid]
+            this.lineSeries[8].data = [...down]
+
+            const bbandsYMax = Math.max(...up)
+            const bbandsYMin = Math.min(...down)
+            this.lineChartOptions.yaxis.max =
+              bbandsYMax > maxYaxis ? bbandsYMax : maxYaxis
+            this.lineChartOptions.yaxis.min =
+              bbandsYMin < minYaxis ? bbandsYMin : maxYaxis
+
+            if (this.lineChartOptions.xaxis.categories.length === 0) {
+              this.lineChartOptions.xaxis.categories = chartData.map(function(
+                item: any
+              ) {
+                return item.x
+              })
+            }
           }
         }
       })

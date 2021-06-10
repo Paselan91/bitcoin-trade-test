@@ -30,6 +30,9 @@ type CandleParams struct {
 	Ema1        string `json:"ema1"`
 	Ema2        string `json:"ema2"`
 	Ema3        string `json:"ema3"`
+	BBands      string `json:"bbands"`
+	BBandsN     string `json:"bbandsN"`
+	BBandsK     string `json:"bbandsK"`
 }
 
 func (t *TickerController) Past(c echo.Context) error {
@@ -44,17 +47,15 @@ func (t *TickerController) Past(c echo.Context) error {
 	unitTimeStamp := candleParams.Time
 	SmasStr := candleParams.Smas
 	EmasStr := candleParams.Emas
+	BBandsStr := candleParams.BBands
 
-	log.Println("EmasStr")
-	log.Println(EmasStr)
-
-	var isSmas bool
+	isSmas := false
 	smas := make([]int, 3)
 	if SmasStr != "" {
+		isSmas = true
 		sma1Str := candleParams.Sma1
 		sma2Str := candleParams.Sma2
 		sma3Str := candleParams.Sma3
-		isSmas = true
 		sma1, err := strconv.Atoi(sma1Str)
 		if sma1Str == "" || err != nil || sma1 < 0 {
 			sma1 = 7
@@ -72,13 +73,13 @@ func (t *TickerController) Past(c echo.Context) error {
 		smas[2] = sma3
 	}
 
-	var isEmas bool
+	isEmas := false
 	emas := make([]int, 3)
 	if EmasStr != "" {
+		isEmas = true
 		ema1Str := candleParams.Ema1
 		ema2Str := candleParams.Ema2
 		ema3Str := candleParams.Ema3
-		isEmas = true
 		ema1, err := strconv.Atoi(ema1Str)
 		if ema1Str == "" || err != nil || ema1 < 0 {
 			ema1 = 7
@@ -96,6 +97,31 @@ func (t *TickerController) Past(c echo.Context) error {
 		emas[2] = ema3
 	}
 
+	log.Println("BBandsStr")
+	log.Println(BBandsStr)
+	log.Println("candleParams.BBandsN")
+	log.Println(candleParams.BBandsN)
+	log.Println("candleParams.BBandsK")
+	log.Println(candleParams.BBandsK)
+
+	isBBands := false
+	var bbandsN, bbandsK int
+	if BBandsStr != "" {
+		isBBands = true
+		bbandsNStr := candleParams.BBandsN
+		bbandsKStr := candleParams.BBandsK
+		n, err := strconv.Atoi(bbandsNStr)
+		bbandsN = n
+		if bbandsNStr == "" || err != nil || bbandsN < 0 {
+			bbandsN = 20
+		}
+		k, err := strconv.Atoi(bbandsNStr)
+		bbandsK = k
+		if bbandsKStr == "" || err != nil || bbandsK < 0 {
+			bbandsK = 2
+		}
+	}
+
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
 		beforeAfter,
@@ -104,10 +130,13 @@ func (t *TickerController) Past(c echo.Context) error {
 		smas,
 		isEmas,
 		emas,
+		isBBands,
+		bbandsN,
+		bbandsK,
 	)
 
-	log.Println("dataFlameCandles")
-	log.Println(dataFlameCandles)
+	log.Println("dataFlameCandles.BBands")
+	log.Println(dataFlameCandles.BBands)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)

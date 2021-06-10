@@ -20,6 +20,9 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 	smas []int,
 	isEma bool,
 	emas []int,
+	isBBands bool,
+	bbandsN int,
+	bbandsK int,
 ) (*models.DataFrameCandle, error) {
 
 	apiClient := New("", "")
@@ -40,6 +43,9 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 		df.AddEma(emas[0])
 		df.AddEma(emas[1])
 		df.AddEma(emas[2])
+	}
+	if isBBands {
+		df.AddBBands(bbandsN, float64(bbandsK))
 	}
 	return &df, err
 }
