@@ -100,6 +100,14 @@
           </v-container>
         </v-col>
         <v-col cols="2">
+          <v-container class="px-0" fluid>
+            <v-checkbox
+              v-model="isIchimokuCloud"
+              :label="`Ichimoku Cloud`"
+            ></v-checkbox>
+          </v-container>
+        </v-col>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -178,6 +186,8 @@ export default class GenericChart extends Vue {
   bbandsN: number = 20
   bbandsK: number = 2
 
+  isIchimokuCloud: Boolean = false
+
   url: string = "api/v1/candles"
   beforeAfter: string = "after"
   periods: Array<object> = [
@@ -253,6 +263,7 @@ export default class GenericChart extends Vue {
     }
   }
 
+  // FIXME: Add each data after Get res
   public lineSeries = [
     {
       name: "SMA1",
@@ -289,6 +300,26 @@ export default class GenericChart extends Vue {
     {
       name: "BBands Low",
       data: []
+    },
+    {
+      name: "Ichimoku Tenkan",
+      data: []
+    },
+    {
+      name: "Ichimoku Kijun",
+      data: []
+    },
+    {
+      name: "Ichimoku SenkouA",
+      data: []
+    },
+    {
+      name: "Ichimoku SenkouB",
+      data: []
+    },
+    {
+      name: "Ichimoku Chikou",
+      data: []
     }
   ]
 
@@ -308,7 +339,7 @@ export default class GenericChart extends Vue {
       width: 1
     },
     title: {
-      text: "Product Trends by Month",
+      text: "Line Chart",
       align: "left"
     },
     grid: {
@@ -326,6 +357,7 @@ export default class GenericChart extends Vue {
     }
   }
 
+  // TODO: uncommentout after app developed
   // mounted() {
   //   const yesterday = new Date(this.today)
   //   yesterday.setDate(yesterday.getDate() - 1)
@@ -382,7 +414,8 @@ export default class GenericChart extends Vue {
             bbandsN: this.bbandsN,
             bbandsK: this.bbandsK
           }
-        : {})
+        : {}),
+      ichimoku: this.isIchimokuCloud ? "1" : "" // FIXME: 1
     }
     console.log("requestData")
     console.log(requestData)
@@ -447,6 +480,7 @@ export default class GenericChart extends Vue {
             this.lineSeries[1].data = [...sma2]
             this.lineSeries[2].data = [...sma3]
 
+            // FIXME: Caculate and get data from BE
             const smaYMax = Math.max(...[...sma1, ...sma2, ...sma3])
             const smaYMin = Math.min(...[...sma1, ...sma2, ...sma3])
             this.lineChartOptions.yaxis.max =
@@ -470,6 +504,7 @@ export default class GenericChart extends Vue {
             this.lineSeries[4].data = [...ema2]
             this.lineSeries[5].data = [...ema3]
 
+            // FIXME: Caculate and get data from BE
             const emaYMax = Math.max(...[...ema1, ...ema2, ...ema3])
             const emaYMin = Math.min(...[...ema1, ...ema2, ...ema3])
             this.lineChartOptions.yaxis.max =
@@ -495,12 +530,47 @@ export default class GenericChart extends Vue {
             this.lineSeries[7].data = [...mid]
             this.lineSeries[8].data = [...down]
 
+            // FIXME: Caculate and get data from BE
             const bbandsYMax = Math.max(...up)
             const bbandsYMin = Math.min(...down)
             this.lineChartOptions.yaxis.max =
               bbandsYMax > maxYaxis ? bbandsYMax : maxYaxis
             this.lineChartOptions.yaxis.min =
               bbandsYMin < minYaxis ? bbandsYMin : maxYaxis
+
+            if (this.lineChartOptions.xaxis.categories.length === 0) {
+              this.lineChartOptions.xaxis.categories = chartData.map(function(
+                item: any
+              ) {
+                return item.x
+              })
+            }
+          }
+
+          if (res.data.ichimoku) {
+            const tenkan: any = res.data.ichimoku.tenkan
+            const kijun: any = res.data.ichimoku.kijun
+            const senkoua: any = res.data.ichimoku.senkoua
+            const senkoub: any = res.data.ichimoku.senkoub
+            const chikou: any = res.data.ichimoku.chikou
+
+            this.lineSeries[9].data = [...tenkan]
+            this.lineSeries[10].data = [...kijun]
+            this.lineSeries[11].data = [...senkoua]
+            this.lineSeries[12].data = [...senkoub]
+            this.lineSeries[13].data = [...chikou]
+
+            // FIXME: Caculate and get data from BE
+            const ichimokuYMax = Math.max(
+              ...[...tenkan, ...kijun, ...senkoua, ...senkoub, ...chikou]
+            )
+            const ichimokuYMin = Math.min(
+              ...[...tenkan, ...kijun, ...senkoua, ...senkoub, ...chikou]
+            )
+            this.lineChartOptions.yaxis.max =
+              ichimokuYMax > maxYaxis ? ichimokuYMax : maxYaxis
+            this.lineChartOptions.yaxis.min =
+              ichimokuYMin < minYaxis ? ichimokuYMin : maxYaxis
 
             if (this.lineChartOptions.xaxis.categories.length === 0) {
               this.lineChartOptions.xaxis.categories = chartData.map(function(
