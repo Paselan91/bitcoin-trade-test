@@ -108,6 +108,11 @@
           </v-container>
         </v-col>
         <v-col cols="2">
+          <v-container class="px-0" fluid>
+            <v-checkbox v-model="isVolume" :label="`Volume`"></v-checkbox>
+          </v-container>
+        </v-col>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -128,15 +133,25 @@
           <v-progress-circular :size="50" indeterminate></v-progress-circular>
         </div>
         <div v-else>
-          <div id="chart">
-            <apexchart
-              type="candlestick"
-              height="350"
-              :options="candlestickChartOptions"
-              :series="candlestickSeries"
-            ></apexchart>
+          <div id="chart-box">
+            <div id="chart-candlestick">
+              <apexchart
+                type="candlestick"
+                height="350"
+                :options="candlestickChartOptions"
+                :series="candlestickSeries"
+              ></apexchart>
+            </div>
+            <div v-if="isVolume" id="chart-bar">
+              <apexchart
+                type="bar"
+                height="160"
+                :options="chartOptionsBar"
+                :series="seriesBar"
+              ></apexchart>
+            </div>
           </div>
-          <div id="chart">
+          <div v-if="isLine" id="chart">
             <apexchart
               type="line"
               height="350"
@@ -188,7 +203,11 @@ export default class GenericChart extends Vue {
 
   isIchimokuCloud: Boolean = false
 
-  url: string = "api/v1/candles"
+  isVolume: Boolean = false
+
+  isLine: Boolean = false
+
+  url: string = "/api/v1/candles"
   beforeAfter: string = "after"
   periods: Array<object> = [
     { label: "1m", value: 60 },
@@ -243,7 +262,15 @@ export default class GenericChart extends Vue {
   public candlestickChartOptions: any = {
     chart: {
       type: "candlestick",
-      height: 350
+      height: 350,
+      id: "candles",
+      toolbar: {
+        autoSelected: "pan",
+        show: false
+      },
+      zoom: {
+        enabled: false
+      }
     },
     title: {
       text: "CandleStick Chart",
@@ -262,6 +289,13 @@ export default class GenericChart extends Vue {
       max: undefined
     }
   }
+
+  public seriesBar = [
+    {
+      name: "volume",
+      data: []
+    }
+  ]
 
   // FIXME: Add each data after Get res
   public lineSeries = [
@@ -322,6 +356,67 @@ export default class GenericChart extends Vue {
       data: []
     }
   ]
+
+  public chartOptionsBar: any = {
+    chart: {
+      height: 350,
+      type: "bar",
+      brush: {
+        enabled: true,
+        target: "candles"
+      },
+      selection: {
+        enabled: true,
+        xaxis: {
+          min: undefined,
+          max: undefined
+        },
+        fill: {
+          color: "#ccc",
+          opacity: 0.4
+        },
+        stroke: {
+          color: "#0D47A1"
+        }
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: "80%",
+        colors: {
+          ranges: [
+            {
+              from: -1000,
+              to: 0,
+              color: "#F15B46"
+            },
+            {
+              from: 1,
+              to: 10000,
+              color: "#FEB019"
+            }
+          ]
+        }
+      }
+    },
+    stroke: {
+      width: 0
+    }
+    // xaxis: {
+    //   type: "datetime",
+    //   axisBorder: {
+    //     offsetX: 13
+    //   }
+    // },
+    // yaxis: {
+    //   labels: {
+    //     show: false
+    //   }
+    // }
+  }
 
   public lineChartOptions: any = {
     chart: {
@@ -450,7 +545,6 @@ export default class GenericChart extends Vue {
             x: new Date(value.close_time * 1000),
             y: [value.open, value.high, value.low, value.close]
           }))
-
           this.candlestickSeries = [
             {
               data: chartData
@@ -470,6 +564,13 @@ export default class GenericChart extends Vue {
           this.candlestickChartOptions.yaxis.min = minYaxis
           this.candlestickChartOptions.xaxis.maxHeight = maxXaxis
           this.candlestickChartOptions.xaxis.minHeight = minXaxis
+
+          if (this.isVolume) {
+            const volumes: any = data.map(function(value) {
+              return value.volume
+            })
+            this.seriesBar[0].data = volumes
+          }
 
           if (res.data.smas) {
             const sma1: any = res.data.smas[0].values
@@ -580,6 +681,9 @@ export default class GenericChart extends Vue {
               })
             }
           }
+
+          this.isLine =
+            this.isSmas || this.isEmas || this.isBBands || this.isIchimokuCloud
         }
       })
       .catch(e => {
