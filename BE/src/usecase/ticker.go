@@ -23,6 +23,7 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 	isBBands bool,
 	bbandsN int,
 	bbandsK int,
+	isIchimoku bool,
 ) (*models.DataFrameCandle, error) {
 
 	apiClient := New("", "")
@@ -46,6 +47,9 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 	}
 	if isBBands {
 		df.AddBBands(bbandsN, float64(bbandsK))
+	}
+	if isIchimoku {
+		df.AddIchimoku()
 	}
 	return &df, err
 }

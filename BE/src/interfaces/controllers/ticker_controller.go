@@ -17,7 +17,7 @@ func NewTickerController() *TickerController {
 	return &TickerController{}
 }
 
-// FIXME: sma,emeaはオブジェクトにしたい
+// FIXME: sma,emea,BBandsはオブジェクトにしたい
 type CandleParams struct {
 	Periods     string `json:"Periods"`
 	BeforeAfter string `json:"BeforeAfter"`
@@ -33,6 +33,7 @@ type CandleParams struct {
 	BBands      string `json:"bbands"`
 	BBandsN     string `json:"bbandsN"`
 	BBandsK     string `json:"bbandsK"`
+	Ichimoku    string `json:"ichimoku"`
 }
 
 func (t *TickerController) Past(c echo.Context) error {
@@ -45,13 +46,14 @@ func (t *TickerController) Past(c echo.Context) error {
 	periods := candleParams.Periods
 	beforeAfter := candleParams.BeforeAfter
 	unitTimeStamp := candleParams.Time
-	SmasStr := candleParams.Smas
-	EmasStr := candleParams.Emas
-	BBandsStr := candleParams.BBands
+	smasStr := candleParams.Smas
+	emasStr := candleParams.Emas
+	bbandsStr := candleParams.BBands
+	ichimokuStr := candleParams.Ichimoku
 
 	isSmas := false
 	smas := make([]int, 3)
-	if SmasStr != "" {
+	if smasStr != "" {
 		isSmas = true
 		sma1Str := candleParams.Sma1
 		sma2Str := candleParams.Sma2
@@ -75,7 +77,7 @@ func (t *TickerController) Past(c echo.Context) error {
 
 	isEmas := false
 	emas := make([]int, 3)
-	if EmasStr != "" {
+	if emasStr != "" {
 		isEmas = true
 		ema1Str := candleParams.Ema1
 		ema2Str := candleParams.Ema2
@@ -99,7 +101,7 @@ func (t *TickerController) Past(c echo.Context) error {
 
 	isBBands := false
 	var bbandsN, bbandsK int
-	if BBandsStr != "" {
+	if bbandsStr != "" {
 		isBBands = true
 		bbandsNStr := candleParams.BBandsN
 		bbandsKStr := candleParams.BBandsK
@@ -115,6 +117,12 @@ func (t *TickerController) Past(c echo.Context) error {
 		}
 	}
 
+	isIchimoku := false
+	if ichimokuStr != "" {
+		isIchimoku = true
+	}
+	isIchimoku = true
+
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
 		beforeAfter,
@@ -126,7 +134,10 @@ func (t *TickerController) Past(c echo.Context) error {
 		isBBands,
 		bbandsN,
 		bbandsK,
+		isIchimoku,
 	)
+	// log.Println("dataFlameCandles.IchimokuCloud")
+	// log.Println(dataFlameCandles.IchimokuCloud)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
