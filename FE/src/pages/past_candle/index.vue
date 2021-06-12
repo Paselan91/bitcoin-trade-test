@@ -67,7 +67,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-container class="px-0" fluid>
             <v-checkbox v-model="isSmas" :label="`SMAS`"></v-checkbox>
             <div v-if="isSmas">
@@ -77,7 +77,7 @@
             </div>
           </v-container>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-container class="px-0" fluid>
             <v-checkbox v-model="isEmas" :label="`EMAS`"></v-checkbox>
             <div v-if="isEmas">
@@ -87,7 +87,7 @@
             </div>
           </v-container>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-container class="px-0" fluid>
             <v-checkbox
               v-model="isBBands"
@@ -99,7 +99,7 @@
             </div>
           </v-container>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-container class="px-0" fluid>
             <v-checkbox
               v-model="isIchimokuCloud"
@@ -107,11 +107,39 @@
             ></v-checkbox>
           </v-container>
         </v-col>
-        <v-col cols="2">
+        <v-col cols="1">
           <v-container class="px-0" fluid>
             <v-checkbox v-model="isVolume" :label="`Volume`"></v-checkbox>
           </v-container>
         </v-col>
+        <v-col cols="1">
+          <v-checkbox v-model="isRsi" :label="`RSI`"></v-checkbox>
+          <div v-if="isRsi">
+            <v-text-field v-model="rsi" label="Period" required></v-text-field>
+          </div>
+        </v-col>
+        <v-col cols="1">
+          <v-checkbox v-model="isMacd" :label="`MACD`"></v-checkbox>
+          <div v-if="isMacd">
+            <v-text-field
+              v-model="macd1"
+              label="Period 1"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="macd2"
+              label="Period 2"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="macd3"
+              label="Period 3"
+              required
+            ></v-text-field>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col cols="2">
           <h3>You selected</h3>
           <p>
@@ -145,19 +173,36 @@
             <div v-if="isVolume" id="chart-bar">
               <apexchart
                 type="bar"
-                height="160"
-                :options="chartOptionsBar"
-                :series="seriesBar"
+                height="350"
+                :options="volumeChartOptions"
+                :series="volumeChartSeries"
               ></apexchart>
             </div>
-          </div>
-          <div v-if="isLine" id="chart">
-            <apexchart
-              type="line"
-              height="350"
-              :options="lineChartOptions"
-              :series="lineSeries"
-            ></apexchart>
+            <div v-if="isRsi" id="chart-line">
+              <apexchart
+                type="line"
+                height="350"
+                :options="rsiLineChartOptions"
+                :series="rsiLineSeries"
+              ></apexchart>
+            </div>
+            <div v-if="isLine" id="chart">
+              <apexchart
+                type="line"
+                height="350"
+                :options="lineChartOptions"
+                :series="lineSeries"
+              ></apexchart>
+            </div>
+            <div v-if="isMacd" id="chart">
+              <apexchart
+                type="line"
+                height="350"
+                :options="macdChartOptions"
+                :series="macdSeries"
+              >
+              </apexchart>
+            </div>
           </div>
         </div>
       </client-only>
@@ -187,6 +232,8 @@ import axios from "axios"
 export default class GenericChart extends Vue {
   isLoading: Boolean = false
 
+  isLine: Boolean = false
+
   isSmas: Boolean = false
   sma1: number = 7
   sma2: number = 14
@@ -205,7 +252,13 @@ export default class GenericChart extends Vue {
 
   isVolume: Boolean = false
 
-  isLine: Boolean = false
+  isRsi: Boolean = false
+  rsi: number = 14
+
+  isMacd: Boolean = false
+  macd1: number = 12
+  macd2: number = 26
+  macd3: number = 9
 
   url: string = "/api/v1/candles"
   beforeAfter: string = "after"
@@ -290,7 +343,7 @@ export default class GenericChart extends Vue {
     }
   }
 
-  public seriesBar = [
+  public volumeChartSeries = [
     {
       name: "volume",
       data: []
@@ -357,7 +410,76 @@ export default class GenericChart extends Vue {
     }
   ]
 
-  public chartOptionsBar: any = {
+  public rsiLineSeries = [
+    {
+      name: "RSI",
+      data: []
+    }
+  ]
+
+  public rsiLineChartOptions: any = {
+    chart: {
+      height: 200,
+      type: "line",
+      zoom: {
+        enabled: true
+      }
+    },
+    annotations: {
+      yaxis: [
+        {
+          y: 30,
+          borderColor: "#00E396",
+          label: {
+            borderColor: "#00E396",
+            style: {
+              color: "#fff",
+              background: "#00E396"
+            },
+            text: "30%"
+          }
+        },
+        {
+          y: 70,
+          borderColor: "#00E396",
+          label: {
+            borderColor: "#00E396",
+            style: {
+              color: "#fff",
+              background: "#00E396"
+            },
+            text: "70%"
+          }
+        }
+      ]
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: "straight",
+      width: 1
+    },
+    title: {
+      text: "RSI Chart",
+      align: "left"
+    },
+    grid: {
+      row: {
+        colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+        opacity: 0.5
+      }
+    },
+    xaxis: {
+      categories: []
+    },
+    yaxis: {
+      min: 0,
+      max: 100
+    }
+  }
+
+  public volumeChartOptions: any = {
     chart: {
       height: 350,
       type: "bar",
@@ -452,6 +574,26 @@ export default class GenericChart extends Vue {
     }
   }
 
+  public macdSeries: any = []
+
+  public macdChartOptions: any = {
+    chart: {
+      height: 350,
+      type: "line"
+    },
+    stroke: {
+      curve: "straight",
+      width: 1
+    },
+    title: {
+      text: "MACD",
+      align: "left"
+    }
+    // xaxis: {
+    //   type: "datetime"
+    // }
+  }
+
   // TODO: uncommentout after app developed
   // mounted() {
   //   const yesterday = new Date(this.today)
@@ -510,7 +652,21 @@ export default class GenericChart extends Vue {
             bbandsK: this.bbandsK
           }
         : {}),
-      ichimoku: this.isIchimokuCloud ? "1" : "" // FIXME: 1
+      ichimoku: this.isIchimokuCloud ? "1" : "", // FIXME: 1
+      rsi: this.isRsi ? "1" : "", // FIXME: 1
+      ...(this.isRsi
+        ? {
+            rsiPeriod: this.rsi
+          }
+        : {}),
+      macd: this.isMacd ? "1" : "", // FIXME: 1
+      ...(this.isMacd
+        ? {
+            macd1: this.macd1,
+            macd2: this.macd2,
+            macd3: this.macd3
+          }
+        : {})
     }
     console.log("requestData")
     console.log(requestData)
@@ -569,7 +725,7 @@ export default class GenericChart extends Vue {
             const volumes: any = data.map(function(value) {
               return value.volume
             })
-            this.seriesBar[0].data = volumes
+            this.volumeChartSeries[0].data = volumes
           }
 
           if (res.data.smas) {
@@ -680,6 +836,62 @@ export default class GenericChart extends Vue {
                 return item.x
               })
             }
+          }
+
+          if (res.data.rsi) {
+            const rsi: any = res.data.rsi.values
+
+            this.rsiLineSeries[0].data = [...rsi]
+
+            // FIXME: Caculate and get data from BE
+            this.rsiLineChartOptions.xaxis.categories = chartData.map(function(
+              item: any
+            ) {
+              return item.x
+            })
+          }
+
+          if (res.data.macd) {
+            // Macd         []float64 `json:"macd,omitempty"`
+            // MacdSignal   []float64 `json:"macd_signal,omitempty"`
+            // MacdHist     []float64 `json:"macd_hist,omitempty"`
+            const macd: any = res.data.macd.macd
+            const macdSignal: any = res.data.macd.macd_signal
+            const macdHist: any = res.data.macd.macd_hist
+
+            this.macdSeries = [
+              {
+                name: "MACD",
+                type: "line",
+                data: [...macd]
+              },
+              {
+                name: "MACD Signal",
+                type: "line",
+                data: [...macdSignal]
+              },
+              {
+                name: "MACD Histogram",
+                type: "column",
+                data: [...macdHist]
+              }
+            ]
+
+            // FIXME: Caculate and get data from BE
+            const macdYMax = Math.max(...[...macd, ...macdSignal])
+            const macdYMin = Math.min(...[...macd, ...macdSignal])
+            console.log(macdYMax)
+            console.log(macdYMin)
+            // this.macdChartOptions.yaxis.max = macdYMax
+            // this.macdChartOptions.yaxis.min = macdYMin
+            // this.macdChartOptions.xaxis.categories = chartData.map(function(
+            //   item: any
+            // ) {
+            //   return item.x
+            // })
+
+            console.log("this.macdSeries")
+            console.log(this.macdSeries)
           }
 
           this.isLine =
