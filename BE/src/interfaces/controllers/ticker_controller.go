@@ -4,7 +4,7 @@ import (
 	"app/src/usecase"
 	// "fmt"
 	"github.com/labstack/echo"
-	// "log"
+	"log"
 	"net/http"
 	// "reflect"
 	"strconv"
@@ -36,6 +36,10 @@ type CandleParams struct {
 	Ichimoku    string `json:"ichimoku"`
 	Rsi         string `json:"rsi"`
 	RsiPeriod   string `json:"rsiPeriod"`
+	Macd        string `json:"macd"`
+	Macd1       string `json:"macd1"`
+	Macd2       string `json:"macd2"`
+	Macd3       string `json:"macd3"`
 }
 
 func (t *TickerController) Past(c echo.Context) error {
@@ -53,6 +57,7 @@ func (t *TickerController) Past(c echo.Context) error {
 	bbandsStr := candleParams.BBands
 	ichimokuStr := candleParams.Ichimoku
 	rsiStr := candleParams.Rsi
+	macdStr := candleParams.Macd
 
 	isSmas := false
 	smas := make([]int, 3)
@@ -137,6 +142,34 @@ func (t *TickerController) Past(c echo.Context) error {
 		}
 	}
 
+	isMacd := false
+	macds := make([]int, 3)
+	if macdStr != "" {
+		isMacd = true
+		macd1Str := candleParams.Macd1
+		macd2Str := candleParams.Macd2
+		macd3Str := candleParams.Macd3
+		macd1, err := strconv.Atoi(macd1Str)
+		if macd1Str == "" || err != nil || macd1 < 0 {
+			macd1 = 12
+		}
+		macd2, err := strconv.Atoi(macd2Str)
+		if macd2Str == "" || err != nil || macd2 < 0 {
+			macd2 = 26
+		}
+		macd3, err := strconv.Atoi(macd3Str)
+		if macd3Str == "" || err != nil || macd3 < 0 {
+			macd3 = 9
+		}
+		macds[0] = macd1
+		macds[1] = macd2
+		macds[2] = macd3
+	}
+	log.Println("isMacd")
+	log.Println(isMacd)
+	log.Println("macds")
+	log.Println(macds)
+
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
 		beforeAfter,
@@ -151,9 +184,11 @@ func (t *TickerController) Past(c echo.Context) error {
 		isIchimoku,
 		isRsi,
 		rsiPeriod,
+		isMacd,
+		macds,
 	)
-	// log.Println("dataFlameCandles.Rsi")
-	// log.Println(dataFlameCandles.Rsi)
+	log.Println("dataFlameCandles.Macd")
+	log.Println(dataFlameCandles.Macd)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
