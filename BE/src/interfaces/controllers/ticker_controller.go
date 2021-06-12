@@ -121,7 +121,6 @@ func (t *TickerController) Past(c echo.Context) error {
 	if ichimokuStr != "" {
 		isIchimoku = true
 	}
-	isIchimoku = true
 
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
