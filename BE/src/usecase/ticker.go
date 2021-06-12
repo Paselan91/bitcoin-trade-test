@@ -24,6 +24,8 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 	bbandsN int,
 	bbandsK int,
 	isIchimoku bool,
+	isRsi bool,
+	rsiPeriod int,
 ) (*models.DataFrameCandle, error) {
 
 	apiClient := New("", "")
@@ -50,6 +52,9 @@ func (t *TickerUsecase) FetchDataFlameCandles(
 	}
 	if isIchimoku {
 		df.AddIchimoku()
+	}
+	if isRsi {
+		df.AddRsi(rsiPeriod)
 	}
 	return &df, err
 }

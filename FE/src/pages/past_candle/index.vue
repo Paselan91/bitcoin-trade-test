@@ -113,6 +113,14 @@
           </v-container>
         </v-col>
         <v-col cols="2">
+          <v-checkbox v-model="isRsi" :label="`RSI`"></v-checkbox>
+          <div v-if="isRsi">
+            <v-text-field v-model="rsi" label="Period" required></v-text-field>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="2">
           <h3>You selected</h3>
           <p>
             {{ selectedPeriods.label }} {{ beforeAfter }}
@@ -145,16 +153,24 @@
             <div v-if="isVolume" id="chart-bar">
               <apexchart
                 type="bar"
-                height="160"
+                height="350"
                 :options="chartOptionsBar"
                 :series="seriesBar"
+              ></apexchart>
+            </div>
+            <div v-if="isRsi" id="chart-line">
+              <apexchart
+                type="line"
+                height="350"
+                :options="chartOptionsRsiLine"
+                :series="rsiLineSeries"
               ></apexchart>
             </div>
           </div>
           <div v-if="isLine" id="chart">
             <apexchart
               type="line"
-              height="350"
+              height="200"
               :options="lineChartOptions"
               :series="lineSeries"
             ></apexchart>
@@ -187,6 +203,8 @@ import axios from "axios"
 export default class GenericChart extends Vue {
   isLoading: Boolean = false
 
+  isLine: Boolean = false
+
   isSmas: Boolean = false
   sma1: number = 7
   sma2: number = 14
@@ -205,7 +223,8 @@ export default class GenericChart extends Vue {
 
   isVolume: Boolean = false
 
-  isLine: Boolean = false
+  isRsi: Boolean = false
+  rsi: number = 14
 
   url: string = "/api/v1/candles"
   beforeAfter: string = "after"
@@ -356,6 +375,75 @@ export default class GenericChart extends Vue {
       data: []
     }
   ]
+
+  public rsiLineSeries = [
+    {
+      name: "RSI",
+      data: []
+    }
+  ]
+
+  public chartOptionsRsiLine: any = {
+    chart: {
+      height: 200,
+      type: "line",
+      zoom: {
+        enabled: true
+      }
+    },
+    annotations: {
+      yaxis: [
+        {
+          y: 30,
+          borderColor: "#00E396",
+          label: {
+            borderColor: "#00E396",
+            style: {
+              color: "#fff",
+              background: "#00E396"
+            },
+            text: "30%"
+          }
+        },
+        {
+          y: 70,
+          borderColor: "#00E396",
+          label: {
+            borderColor: "#00E396",
+            style: {
+              color: "#fff",
+              background: "#00E396"
+            },
+            text: "70%"
+          }
+        }
+      ]
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: "straight",
+      width: 1
+    },
+    title: {
+      text: "RSI Chart",
+      align: "left"
+    },
+    grid: {
+      row: {
+        colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+        opacity: 0.5
+      }
+    },
+    xaxis: {
+      categories: []
+    },
+    yaxis: {
+      min: 0,
+      max: 100
+    }
+  }
 
   public chartOptionsBar: any = {
     chart: {
@@ -510,7 +598,13 @@ export default class GenericChart extends Vue {
             bbandsK: this.bbandsK
           }
         : {}),
-      ichimoku: this.isIchimokuCloud ? "1" : "" // FIXME: 1
+      ichimoku: this.isIchimokuCloud ? "1" : "", // FIXME: 1
+      rsi: this.isRsi ? "1" : "", // FIXME: 1
+      ...(this.isRsi
+        ? {
+            rsiPeriod: this.rsi
+          }
+        : {})
     }
     console.log("requestData")
     console.log(requestData)
@@ -680,6 +774,19 @@ export default class GenericChart extends Vue {
                 return item.x
               })
             }
+          }
+
+          if (res.data.rsi) {
+            const rsi: any = res.data.rsi.values
+
+            this.rsiLineSeries[0].data = [...rsi]
+
+            // FIXME: Caculate and get data from BE
+            this.chartOptionsRsiLine.xaxis.categories = chartData.map(function(
+              item: any
+            ) {
+              return item.x
+            })
           }
 
           this.isLine =

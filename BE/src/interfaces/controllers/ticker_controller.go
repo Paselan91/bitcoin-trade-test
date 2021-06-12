@@ -19,9 +19,9 @@ func NewTickerController() *TickerController {
 
 // FIXME: sma,emea,BBandsはオブジェクトにしたい
 type CandleParams struct {
-	Periods     string `json:"Periods"`
-	BeforeAfter string `json:"BeforeAfter"`
-	Time        string `json:"Time"`
+	Periods     string `json:"Periods"`     // FIXME: json to snake case
+	BeforeAfter string `json:"BeforeAfter"` // FIXME: json to snake case
+	Time        string `json:"Time"`        // FIXME: json to lowercase
 	Smas        string `json:"smas"`
 	Sma1        string `json:"sma1"`
 	Sma2        string `json:"sma2"`
@@ -34,6 +34,8 @@ type CandleParams struct {
 	BBandsN     string `json:"bbandsN"`
 	BBandsK     string `json:"bbandsK"`
 	Ichimoku    string `json:"ichimoku"`
+	Rsi         string `json:"rsi"`
+	RsiPeriod   string `json:"rsiPeriod"`
 }
 
 func (t *TickerController) Past(c echo.Context) error {
@@ -50,6 +52,7 @@ func (t *TickerController) Past(c echo.Context) error {
 	emasStr := candleParams.Emas
 	bbandsStr := candleParams.BBands
 	ichimokuStr := candleParams.Ichimoku
+	rsiStr := candleParams.Rsi
 
 	isSmas := false
 	smas := make([]int, 3)
@@ -122,6 +125,18 @@ func (t *TickerController) Past(c echo.Context) error {
 		isIchimoku = true
 	}
 
+	isRsi := false
+	var rsiPeriod int
+	if rsiStr != "" {
+		isRsi = true
+		rsiPeriodStr := candleParams.RsiPeriod
+		period, err := strconv.Atoi(rsiPeriodStr)
+		rsiPeriod = period
+		if rsiPeriodStr == "" || err != nil || period < 0 {
+			rsiPeriod = 14
+		}
+	}
+
 	dataFlameCandles, err := tickerUsecase.FetchDataFlameCandles(
 		periods,
 		beforeAfter,
@@ -134,9 +149,11 @@ func (t *TickerController) Past(c echo.Context) error {
 		bbandsN,
 		bbandsK,
 		isIchimoku,
+		isRsi,
+		rsiPeriod,
 	)
-	// log.Println("dataFlameCandles.IchimokuCloud")
-	// log.Println(dataFlameCandles.IchimokuCloud)
+	// log.Println("dataFlameCandles.Rsi")
+	// log.Println(dataFlameCandles.Rsi)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
