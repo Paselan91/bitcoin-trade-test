@@ -1,212 +1,282 @@
 <!-- buildで落ちる時用 -->
-<!-- <template>
-  <div></div>
-</template> -->
-
+<!-- 
+<template>
+  <div>past candle</div>
+</template>
+-->
 <template>
   <div>
-    <v-container class="grey lighten-5 text-center">
-      <h1>Past Candle</h1>
-      <v-row :align="align" no-gutters>
-        <v-col :cols="5">
-          <v-container>
-            <h3 class="text-center">Choose Periods</h3>
+    <v-card class="mx-auto my-12" max-width="1024">
+      <v-container fluid>
+        <v-row>
+          <v-col :cols="3">
             <v-select
               v-model="selectedPeriods"
               :items="periods"
               label="Periods"
               item-text="label"
               item-value="value"
-              solo
-              return-object
-              width="100px"
+              outlined
             ></v-select>
-          </v-container>
-        </v-col>
-        <v-spacer></v-spacer>
-        <v-col :cols="7">
-          <h3 class="text-center">Choose Date</h3>
-          <v-row>
-            <v-col cols="5">
-              <v-container fluid>
-                <v-radio-group v-model="beforeAfter" mandatory col>
-                  <v-radio label="After" value="after"></v-radio>
-                  <v-radio label="Before" value="before"></v-radio>
-                </v-radio-group>
-              </v-container>
-            </v-col>
-            <v-col cols="7">
-              <v-container>
-                <v-row>
-                  <v-col cols="12" lg="6">
-                    <v-menu
-                      :close-on-content-click="false"
-                      transition="scale-transition"
-                      offset-y
-                      max-width="290px"
-                      min-width="auto"
-                    >
-                      <template #activator="{ on, attrs }">
-                        <v-text-field
-                          v-model="computedDateFormatted"
-                          label="Date"
-                          persistent-hint
-                          prepend-icon="mdi-calendar"
-                          v-bind="attrs"
-                          @blur="date = parseDate(dateFormatted)"
-                          v-on="on"
-                        ></v-text-field>
-                      </template>
-                      <v-date-picker v-model="date" no-title></v-date-picker>
-                    </v-menu>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-col>
+          </v-col>
+          <v-col :cols="3">
+            <v-select
+              v-model="selectedTerms"
+              :items="terms"
+              label="Term"
+              item-text="label"
+              item-value="value"
+              outlined
+            ></v-select>
+          </v-col>
+          <v-col :cols="3">
+            <v-menu
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="auto"
+            >
+              <template #activator="{ on, attrs }">
+                <v-text-field
+                  v-model="computedDateFormatted"
+                  label="Date"
+                  persistent-hint
+                  v-bind="attrs"
+                  outlined
+                  @blur="date = parseDate(dateFormatted)"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="date" no-title></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col :cols="3">
+            <v-menu :offset-y="true" :close-on-content-click="false">
+              <template #activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  outlined
+                  width="200"
+                  height="55"
+                  v-on="on"
+                >
+                  Indicators
+                </v-btn>
+              </template>
+              <v-card width="600">
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col :cols="3">
+                      <v-checkbox v-model="isSmas" :label="`SMAS`"></v-checkbox>
+                    </v-col>
+                    <v-col v-if="isSmas" :cols="3">
+                      <v-text-field
+                        v-model="sma1"
+                        label="SMA1"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isSmas" :cols="3">
+                      <v-text-field
+                        v-model="sma2"
+                        label="SMA2"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isSmas" :cols="3">
+                      <v-text-field
+                        v-model="sma3"
+                        label="SMA3"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col :cols="3">
+                      <v-checkbox v-model="isEmas" :label="`EMAS`"></v-checkbox>
+                    </v-col>
+                    <v-col v-if="isEmas" :cols="3">
+                      <v-text-field
+                        v-model="ema1"
+                        label="EMA1"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isEmas" :cols="3">
+                      <v-text-field
+                        v-model="ema2"
+                        label="EMA2"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isEmas" :cols="3">
+                      <v-text-field
+                        v-model="ema3"
+                        label="EMA3"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col :col="3">
+                      <v-checkbox
+                        v-model="isBBands"
+                        :label="`Bolinger Bands`"
+                      ></v-checkbox>
+                    </v-col>
+                    <v-col v-if="isBBands" :col="3">
+                      <v-text-field
+                        v-model="bbandsN"
+                        label="N"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isBBands" :col="3">
+                      <v-text-field
+                        v-model="bbandsK"
+                        label="K"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col>
+                      <v-checkbox
+                        v-model="isIchimokuCloud"
+                        :label="`Ichimoku Cloud`"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col>
+                      <v-checkbox
+                        v-model="isVolume"
+                        :label="`Volume`"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+                <v-list :height="60">
+                  <v-list-item>
+                    <v-col :col="3">
+                      <v-checkbox v-model="isRsi" :label="`RSI`"></v-checkbox>
+                    </v-col>
+                    <v-col v-if="isRsi" :col="3">
+                      <v-text-field
+                        v-model="rsi"
+                        label="Period"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-spacer></v-spacer>
+                    <v-spacer></v-spacer>
+                  </v-list-item>
+                </v-list>
+                <v-list>
+                  <v-list-item>
+                    <v-col :col="3">
+                      <v-checkbox v-model="isMacd" :label="`MACD`"></v-checkbox>
+                    </v-col>
+                    <v-col v-if="isMacd" :col="3">
+                      <v-text-field
+                        v-model="macd1"
+                        label="Period 1"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isMacd" :col="3">
+                      <v-text-field
+                        v-model="macd2"
+                        label="Period 2"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col v-if="isMacd" :col="3">
+                      <v-text-field
+                        v-model="macd3"
+                        label="Period 3"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-menu>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container>
+        <client-only>
+          <v-row
+            v-if="isLoading"
+            justify="center"
+            align-content="center"
+            class="text-center no-chart-area"
+          >
+            <v-progress-circular :size="70" indeterminate></v-progress-circular>
           </v-row>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="1">
-          <v-container class="px-0" fluid>
-            <v-checkbox v-model="isSmas" :label="`SMAS`"></v-checkbox>
-            <div v-if="isSmas">
-              <v-text-field v-model="sma1" label="SMA1" required></v-text-field>
-              <v-text-field v-model="sma2" label="SMA2" required></v-text-field>
-              <v-text-field v-model="sma3" label="SMA3" required></v-text-field>
+          <div v-else>
+            <div id="chart-box">
+              <div id="chart-candlestick">
+                <apexchart
+                  type="candlestick"
+                  height="350"
+                  :options="candlestickChartOptions"
+                  :series="candlestickSeries"
+                ></apexchart>
+              </div>
+              <div v-if="isVolume" id="chart-bar">
+                <apexchart
+                  type="bar"
+                  height="350"
+                  :options="volumeChartOptions"
+                  :series="volumeChartSeries"
+                ></apexchart>
+              </div>
+              <div v-if="isRsi" id="chart-line">
+                <apexchart
+                  type="line"
+                  height="350"
+                  :options="rsiLineChartOptions"
+                  :series="rsiLineSeries"
+                ></apexchart>
+              </div>
+              <div v-if="isLine" id="chart">
+                <apexchart
+                  type="line"
+                  height="350"
+                  :options="lineChartOptions"
+                  :series="lineSeries"
+                ></apexchart>
+              </div>
+              <div v-if="isMacd" id="chart">
+                <apexchart
+                  type="line"
+                  height="350"
+                  :options="macdChartOptions"
+                  :series="macdSeries"
+                >
+                </apexchart>
+              </div>
             </div>
-          </v-container>
-        </v-col>
-        <v-col cols="1">
-          <v-container class="px-0" fluid>
-            <v-checkbox v-model="isEmas" :label="`EMAS`"></v-checkbox>
-            <div v-if="isEmas">
-              <v-text-field v-model="ema1" label="EMA1" required></v-text-field>
-              <v-text-field v-model="ema2" label="EMA2" required></v-text-field>
-              <v-text-field v-model="ema3" label="EMA3" required></v-text-field>
-            </div>
-          </v-container>
-        </v-col>
-        <v-col cols="1">
-          <v-container class="px-0" fluid>
-            <v-checkbox
-              v-model="isBBands"
-              :label="`Bolinger Bands`"
-            ></v-checkbox>
-            <div v-if="isBBands">
-              <v-text-field v-model="bbandsN" label="N" required></v-text-field>
-              <v-text-field v-model="bbandsK" label="K" required></v-text-field>
-            </div>
-          </v-container>
-        </v-col>
-        <v-col cols="1">
-          <v-container class="px-0" fluid>
-            <v-checkbox
-              v-model="isIchimokuCloud"
-              :label="`Ichimoku Cloud`"
-            ></v-checkbox>
-          </v-container>
-        </v-col>
-        <v-col cols="1">
-          <v-container class="px-0" fluid>
-            <v-checkbox v-model="isVolume" :label="`Volume`"></v-checkbox>
-          </v-container>
-        </v-col>
-        <v-col cols="1">
-          <v-checkbox v-model="isRsi" :label="`RSI`"></v-checkbox>
-          <div v-if="isRsi">
-            <v-text-field v-model="rsi" label="Period" required></v-text-field>
           </div>
-        </v-col>
-        <v-col cols="1">
-          <v-checkbox v-model="isMacd" :label="`MACD`"></v-checkbox>
-          <div v-if="isMacd">
-            <v-text-field
-              v-model="macd1"
-              label="Period 1"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="macd2"
-              label="Period 2"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="macd3"
-              label="Period 3"
-              required
-            ></v-text-field>
-          </div>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="2">
-          <h3>You selected</h3>
-          <p>
-            {{ selectedPeriods.label }} {{ beforeAfter }}
-            {{ date }}
-          </p>
-        </v-col>
-        <v-col cols="2">
-          <v-btn class="my-3" @click="fetchPastCandle">Get Data</v-btn>
-        </v-col>
-        <v-col cols="2">
-          <v-btn class="my-3" @click="healthCheck">health Check</v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-container>
-      <client-only>
-        <div v-if="isLoading" class="text-center">
-          <v-progress-circular :size="50" indeterminate></v-progress-circular>
+        </client-only>
+        <div class="text-center">
+          <v-btn color="primary" rounded @click="fetchPastCandle"
+            >Get Data</v-btn
+          >
         </div>
-        <div v-else>
-          <div id="chart-box">
-            <div id="chart-candlestick">
-              <apexchart
-                type="candlestick"
-                height="350"
-                :options="candlestickChartOptions"
-                :series="candlestickSeries"
-              ></apexchart>
-            </div>
-            <div v-if="isVolume" id="chart-bar">
-              <apexchart
-                type="bar"
-                height="350"
-                :options="volumeChartOptions"
-                :series="volumeChartSeries"
-              ></apexchart>
-            </div>
-            <div v-if="isRsi" id="chart-line">
-              <apexchart
-                type="line"
-                height="350"
-                :options="rsiLineChartOptions"
-                :series="rsiLineSeries"
-              ></apexchart>
-            </div>
-            <div v-if="isLine" id="chart">
-              <apexchart
-                type="line"
-                height="350"
-                :options="lineChartOptions"
-                :series="lineSeries"
-              ></apexchart>
-            </div>
-            <div v-if="isMacd" id="chart">
-              <apexchart
-                type="line"
-                height="350"
-                :options="macdChartOptions"
-                :series="macdSeries"
-              >
-              </apexchart>
-            </div>
-          </div>
-        </div>
-      </client-only>
-    </v-container>
+      </v-container>
+    </v-card>
 
     <v-container class="my-5">
       <v-row justify="center">
@@ -215,12 +285,11 @@
         </v-btn>
       </v-row>
     </v-container>
-
-    <v-container>
+    <!-- <v-container>
       <v-btn class="my-3 text-center" @click="checkParamerters"
         >Check Qeury Parameters</v-btn
       >
-    </v-container>
+    </v-container> -->
   </div>
 </template>
 
@@ -278,7 +347,21 @@ export default class GenericChart extends Vue {
     { label: "1w", value: 604800 }
   ]
 
-  selectedPeriods = { label: "15m", value: 900 }
+  terms: Array<object> = [
+    { label: "After", value: "after" },
+    { label: "Before", value: "before" }
+  ]
+
+  indicators: Array<object> = [
+    { id: 1, name: "SMA" },
+    { id: 2, name: "EMA" },
+    { id: 3, name: "MACD" },
+    { id: 4, name: "Bolinger Bands" },
+    { id: 5, name: "Ichimoku Cloud" }
+  ]
+
+  selectedPeriods = this.periods[3].value
+  selectedTerms = this.terms[0].value
 
   today = new Date()
   date = new Date().toISOString().substr(0, 10)
@@ -626,8 +709,8 @@ export default class GenericChart extends Vue {
     const unixtimestamp = Math.floor(Date.parse(this.date) / 1000)
 
     const requestData = {
-      periods: this.selectedPeriods.value,
-      beforeAfter: this.beforeAfter,
+      periods: this.selectedPeriods,
+      beforeAfter: this.selectedTerms,
       time: unixtimestamp,
       smas: this.isSmas ? "1" : "", // FIXME: 1
       ...(this.isSmas
@@ -905,12 +988,10 @@ export default class GenericChart extends Vue {
       })
     this.isLoading = false
   }
-
-  // TODO: デバッグ用
-  // checkParamerters() {
-  //   console.log("requestData")
-  //   console.log(requestData)
-  // }
-  // @Prop({ required: true, default: "bar" }) type: string
 }
 </script>
+
+<style lang="sass" scoped>
+.no-chart-area
+  height: 350px
+</style>

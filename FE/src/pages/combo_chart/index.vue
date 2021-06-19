@@ -1,8 +1,9 @@
 <!-- buildで落ちる時用 -->
-<!-- <template>
-  <div></div>
-</template> -->
-
+<!--
+<template>
+  <div>combo chart</div>
+</template>
+-->
 <template>
   <div class="chart-box">
     <div id="chart-candlestick">
