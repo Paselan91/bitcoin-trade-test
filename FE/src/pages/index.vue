@@ -974,7 +974,7 @@ export default class GenericChart extends Vue {
         }
       })
       .catch(e => {
-        alert("Apiの取得に失敗しました")
+        alert("Failed to get data")
         console.error(e)
         return false
       })
