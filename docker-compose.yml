@@ -3,6 +3,7 @@ services:
   mysql:
     container_name: "db"
     image: mysql:8.0.23
+    # image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/be
     volumes:
       - ./DB/docker/db/data:/var/lib/mysql
       - ./DB/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -16,6 +17,7 @@ services:
       MYSQL_DATABASE: $MYSQL_DATABASE
   be:
     container_name: "be"
+    image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/be
     build:
       context: ./
       dockerfile: ./BE/docker/app/Dockerfile
