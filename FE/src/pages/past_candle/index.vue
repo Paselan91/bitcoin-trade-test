@@ -4,6 +4,7 @@
   <div>past candle</div>
 </template>
 -->
+<!-- 
 <template>
   <div>
     <v-card class="mx-auto my-12" max-width="1024">
@@ -289,7 +290,7 @@
       <v-btn class="my-3 text-center" @click="checkParamerters"
         >Check Qeury Parameters</v-btn
       >
-    </v-container> -->
+    </v-container>
   </div>
 </template>
 
@@ -995,3 +996,4 @@ export default class GenericChart extends Vue {
 .no-chart-area
   height: 350px
 </style>
+-->

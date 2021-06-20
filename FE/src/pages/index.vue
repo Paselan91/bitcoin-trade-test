@@ -285,45 +285,46 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
+// <script lang="ts">
 import { Component, Vue, Watch } from "nuxt-property-decorator"
 import axios from "axios"
 
 @Component({})
 export default class GenericChart extends Vue {
-  isLoading: Boolean = false
+  isLoading = false
 
-  isLine: Boolean = false
+  isLine = false
 
-  isSmas: Boolean = false
-  sma1: number = 7
-  sma2: number = 14
-  sma3: number = 21
+  isSmas = false
+  sma1 = 7
+  sma2 = 14
+  sma3 = 21
 
-  isEmas: Boolean = false
-  ema1: number = 7
-  ema2: number = 14
-  ema3: number = 21
+  isEmas = false
+  ema1 = 7
+  ema2 = 14
+  ema3 = 21
 
-  isBBands: Boolean = false
-  bbandsN: number = 20
-  bbandsK: number = 2
+  isBBands = false
+  bbandsN = 20
+  bbandsK = 2
 
-  isIchimokuCloud: Boolean = false
+  isIchimokuCloud = false
 
-  isVolume: Boolean = false
+  isVolume = false
 
-  isRsi: Boolean = false
-  rsi: number = 14
+  isRsi = false
+  rsi = 14
 
-  isMacd: Boolean = false
-  macd1: number = 12
-  macd2: number = 26
-  macd3: number = 9
+  isMacd = false
+  macd1 = 12
+  macd2 = 26
+  macd3 = 9
 
-  url: string = "/api/v1/candles"
-  beforeAfter: string = "after"
-  periods: Array<object> = [
+  url = "/api/v1/candles"
+  beforeAfter = "after"
+  periods = [
     { label: "1m", value: 60 },
     { label: "3m", value: 180 },
     { label: "5m", value: 300 },
@@ -339,12 +340,12 @@ export default class GenericChart extends Vue {
     { label: "1w", value: 604800 }
   ]
 
-  terms: Array<object> = [
+  terms = [
     { label: "After", value: "after" },
     { label: "Before", value: "before" }
   ]
 
-  indicators: Array<object> = [
+  indicators = [
     { id: 1, name: "SMA" },
     { id: 2, name: "EMA" },
     { id: 3, name: "MACD" },
@@ -353,7 +354,9 @@ export default class GenericChart extends Vue {
   ]
 
   selectedPeriods = this.periods[3].value
+  // selectedPeriods  = this.periods[3]["value"]
   selectedTerms = this.terms[0].value
+  // selectedTerms = this.terms[0]["value"]
 
   today = new Date()
   date = new Date().toISOString().substr(0, 10)
@@ -362,14 +365,14 @@ export default class GenericChart extends Vue {
     return this.formatDate(this.date)
   }
 
-  formatDate(date: any) {
+  formatDate(date) {
     if (!date) return null
 
     const [year, month, day] = date.split("-")
     return `${month}/${day}/${year}`
   }
 
-  parseDate(date: any) {
+  parseDate(date) {
     if (!date) return null
 
     const [month, day, year] = date.split("/")
@@ -381,13 +384,13 @@ export default class GenericChart extends Vue {
     this.dateFormatted = this.formatDate(this.date)
   }
 
-  public candlestickSeries = [
+  candlestickSeries = [
     {
       data: []
     }
   ]
 
-  public candlestickChartOptions: any = {
+  candlestickChartOptions = {
     chart: {
       type: "candlestick",
       height: 350,
@@ -418,7 +421,7 @@ export default class GenericChart extends Vue {
     }
   }
 
-  public volumeChartSeries = [
+  volumeChartSerie = [
     {
       name: "volume",
       data: []
@@ -426,7 +429,7 @@ export default class GenericChart extends Vue {
   ]
 
   // FIXME: Add each data after Get res
-  public lineSeries = [
+  lineSeries = [
     {
       name: "SMA1",
       data: []
@@ -485,14 +488,14 @@ export default class GenericChart extends Vue {
     }
   ]
 
-  public rsiLineSeries = [
+  rsiLineSeries = [
     {
       name: "RSI",
       data: []
     }
   ]
 
-  public rsiLineChartOptions: any = {
+  rsiLineChartOptions = {
     chart: {
       height: 200,
       type: "line",
@@ -554,7 +557,7 @@ export default class GenericChart extends Vue {
     }
   }
 
-  public volumeChartOptions: any = {
+  volumeChartOptions = {
     chart: {
       height: 350,
       type: "bar",
@@ -602,20 +605,9 @@ export default class GenericChart extends Vue {
     stroke: {
       width: 0
     }
-    // xaxis: {
-    //   type: "datetime",
-    //   axisBorder: {
-    //     offsetX: 13
-    //   }
-    // },
-    // yaxis: {
-    //   labels: {
-    //     show: false
-    //   }
-    // }
   }
 
-  public lineChartOptions: any = {
+  lineChartOptions = {
     chart: {
       height: 350,
       type: "line",
@@ -649,9 +641,9 @@ export default class GenericChart extends Vue {
     }
   }
 
-  public macdSeries: any = []
+  macdSeries = []
 
-  public macdChartOptions: any = {
+  macdChartOptions = {
     chart: {
       height: 350,
       type: "line"
@@ -682,8 +674,8 @@ export default class GenericChart extends Vue {
       .get(this.url)
       .then(res => {
         if (res.status === 200) {
-          console.log("res")
-          console.log(res)
+          // console.log("res")
+          // console.log(res)
         }
       })
       .catch(e => {
@@ -746,8 +738,8 @@ export default class GenericChart extends Vue {
     console.log("requestData")
     console.log(requestData)
 
-    // FIXME: anyに型をつける
-    let data: Array<any>
+    // FIXMEに型をつける
+    let data
 
     await axios
       .get(this.url, { params: requestData })
@@ -772,7 +764,7 @@ export default class GenericChart extends Vue {
            *      QuoteVolume
            *  ]
            **/
-          const chartData: any = data.map(value => ({
+          const chartData = data.map(value => ({
             x: new Date(value.close_time * 1000),
             y: [value.open, value.high, value.low, value.close]
           }))
@@ -782,14 +774,10 @@ export default class GenericChart extends Vue {
             }
           ]
 
-          const maxYaxis = Math.max(
-            ...chartData.map((value: any) => value.y[1])
-          )
-          const minYaxis = Math.min(
-            ...chartData.map((value: any) => value.y[2])
-          )
-          const maxXaxis = Math.max(...chartData.map((value: any) => value.x))
-          const minXaxis = Math.min(...chartData.map((value: any) => value.x))
+          const maxYaxis = Math.max(...chartData.map(value => value.y[1]))
+          const minYaxis = Math.min(...chartData.map(value => value.y[2]))
+          const maxXaxis = Math.max(...chartData.map(value => value.x))
+          const minXaxis = Math.min(...chartData.map(value => value.x))
 
           this.candlestickChartOptions.yaxis.max = maxYaxis
           this.candlestickChartOptions.yaxis.min = minYaxis
@@ -797,16 +785,16 @@ export default class GenericChart extends Vue {
           this.candlestickChartOptions.xaxis.minHeight = minXaxis
 
           if (this.isVolume) {
-            const volumes: any = data.map(function(value) {
+            const volumes = data.map(function(value) {
               return value.volume
             })
             this.volumeChartSeries[0].data = volumes
           }
 
           if (res.data.smas) {
-            const sma1: any = res.data.smas[0].values
-            const sma2: any = res.data.smas[1].values
-            const sma3: any = res.data.smas[2].values
+            const sma1 = res.data.smas[0].values
+            const sma2 = res.data.smas[1].values
+            const sma3 = res.data.smas[2].values
 
             this.lineSeries[0].data = [...sma1]
             this.lineSeries[1].data = [...sma2]
@@ -821,16 +809,16 @@ export default class GenericChart extends Vue {
               smaYMin < minYaxis ? smaYMin : maxYaxis
 
             this.lineChartOptions.xaxis.categories = chartData.map(function(
-              item: any
+              item
             ) {
               return item.x
             })
           }
 
           if (res.data.emas) {
-            const ema1: any = res.data.emas[0].values
-            const ema2: any = res.data.emas[1].values
-            const ema3: any = res.data.emas[2].values
+            const ema1 = res.data.emas[0].values
+            const ema2 = res.data.emas[1].values
+            const ema3 = res.data.emas[2].values
 
             this.lineSeries[3].data = [...ema1]
             this.lineSeries[4].data = [...ema2]
@@ -846,7 +834,7 @@ export default class GenericChart extends Vue {
 
             if (this.lineChartOptions.xaxis.categories.length === 0) {
               this.lineChartOptions.xaxis.categories = chartData.map(function(
-                item: any
+                item
               ) {
                 return item.x
               })
@@ -854,9 +842,9 @@ export default class GenericChart extends Vue {
           }
 
           if (res.data.bbands) {
-            const up: any = res.data.bbands.up
-            const mid: any = res.data.bbands.mid
-            const down: any = res.data.bbands.down
+            const up = res.data.bbands.up
+            const mid = res.data.bbands.mid
+            const down = res.data.bbands.down
 
             this.lineSeries[6].data = [...up]
             this.lineSeries[7].data = [...mid]
@@ -872,7 +860,7 @@ export default class GenericChart extends Vue {
 
             if (this.lineChartOptions.xaxis.categories.length === 0) {
               this.lineChartOptions.xaxis.categories = chartData.map(function(
-                item: any
+                item
               ) {
                 return item.x
               })
@@ -880,11 +868,11 @@ export default class GenericChart extends Vue {
           }
 
           if (res.data.ichimoku) {
-            const tenkan: any = res.data.ichimoku.tenkan
-            const kijun: any = res.data.ichimoku.kijun
-            const senkoua: any = res.data.ichimoku.senkoua
-            const senkoub: any = res.data.ichimoku.senkoub
-            const chikou: any = res.data.ichimoku.chikou
+            const tenkan = res.data.ichimoku.tenkan
+            const kijun = res.data.ichimoku.kijun
+            const senkoua = res.data.ichimoku.senkoua
+            const senkoub = res.data.ichimoku.senkoub
+            const chikou = res.data.ichimoku.chikou
 
             this.lineSeries[9].data = [...tenkan]
             this.lineSeries[10].data = [...kijun]
@@ -906,7 +894,7 @@ export default class GenericChart extends Vue {
 
             if (this.lineChartOptions.xaxis.categories.length === 0) {
               this.lineChartOptions.xaxis.categories = chartData.map(function(
-                item: any
+                item
               ) {
                 return item.x
               })
@@ -914,13 +902,13 @@ export default class GenericChart extends Vue {
           }
 
           if (res.data.rsi) {
-            const rsi: any = res.data.rsi.values
+            const rsi = res.data.rsi.values
 
             this.rsiLineSeries[0].data = [...rsi]
 
             // FIXME: Caculate and get data from BE
             this.rsiLineChartOptions.xaxis.categories = chartData.map(function(
-              item: any
+              item
             ) {
               return item.x
             })
@@ -930,9 +918,9 @@ export default class GenericChart extends Vue {
             // Macd         []float64 `json:"macd,omitempty"`
             // MacdSignal   []float64 `json:"macd_signal,omitempty"`
             // MacdHist     []float64 `json:"macd_hist,omitempty"`
-            const macd: any = res.data.macd.macd
-            const macdSignal: any = res.data.macd.macd_signal
-            const macdHist: any = res.data.macd.macd_hist
+            const macd = res.data.macd.macd
+            const macdSignal = res.data.macd.macd_signal
+            const macdHist = res.data.macd.macd_hist
 
             this.macdSeries = [
               {
@@ -960,7 +948,7 @@ export default class GenericChart extends Vue {
             // this.macdChartOptions.yaxis.max = macdYMax
             // this.macdChartOptions.yaxis.min = macdYMin
             // this.macdChartOptions.xaxis.categories = chartData.map(function(
-            //   item: any
+            //   item
             // ) {
             //   return item.x
             // })

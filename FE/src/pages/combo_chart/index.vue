@@ -4,6 +4,7 @@
   <div>combo chart</div>
 </template>
 -->
+<!--
 <template>
   <div class="chart-box">
     <div id="chart-candlestick">
@@ -213,3 +214,4 @@ export default class ComboChart extends Vue {
   }
 }
 </script>
+-->
