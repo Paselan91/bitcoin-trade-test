@@ -6,7 +6,7 @@
 <template>
   <div>
     <v-container>
-      <nuxt-link to="/test2">test2</nuxt-link>
+      <nuxt-link to="/candle_line_test/test2">test2</nuxt-link>
       <div id="chart"></div>
     </v-container>
 

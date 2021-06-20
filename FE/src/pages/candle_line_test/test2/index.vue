@@ -4,13 +4,13 @@
 </template> -->
 
 <template>
-  <div class="chart"></div>
+  <div id="chart"></div>
 </template>
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script lang="ts">
 import { Component, Vue } from "nuxt-property-decorator"
-import axios from "axios"
+// import axios from "axios"
+import ApexCharts from "apexcharts"
 
 @Component({})
 export default class ComboChart2 extends Vue {
