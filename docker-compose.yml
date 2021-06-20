@@ -1,14 +1,84 @@
+# version: '3'
+# services:
+#   mysql:
+#     container_name: "db"
+#     image: mysql:8.0.23
+#     # image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/db
+#     # volumes:
+#     #   - ./DB/docker/db/data:/var/lib/mysql
+#     #   - ./DB/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+#     command: ["--default-authentication-plugin=mysql_native_password"]
+#     ports:
+#       - 3306:3306
+#       # - $MYSQL_PORT:3306
+#     environment:
+#       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+#       MYSQL_USER: $MYSQL_USER
+#       MYSQL_PASSWORD: $MYSQL_PASSWORD
+#       MYSQL_DATABASE: $MYSQL_DATABASE
+#   be:
+#     container_name: "be"
+#     image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/be
+#     # build:
+#     #   context: ./
+#     #   dockerfile: ./BE/docker/app/Dockerfile
+#     depends_on:
+#       - mysql
+#     environment:
+#       - ENV_MODE=dev
+#       - BE_PORT=$BE_PORT
+#       - API_KEY=$API_KEY
+#       - API_SECRET=$API_SECRET
+#       - PRODUCT_CODE=$PRODUCT_CODE
+#       - API_BASE_URL=$API_BASE_URL
+#       - CRYPTOWATCH_URL=$CRYPTOWATCH_URL
+#     ports:
+#       - 8000:8000
+#       # - $BE_PORT:8000
+#     working_dir: /usr/src/app/BE
+#     # volumes:
+#     #   - ./:/usr/src/app
+#     command: realize start --run
+#     # tty: true
+#     # stdin_open: true
+#   fe:
+#     image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/fe
+#     container_name: "fe"
+#     # build:
+#     #   context: ./
+#     #   dockerfile: ./FE/Dockerfile
+#     command: ['/bin/bash', '-c', 'NUXT_HOST=0.0.0.0 yarn run dev']
+#     working_dir: /usr/src/app/FE
+#     # volumes:
+#     #   - ./:/usr/src/app
+#     ports:
+#       - 3000:3000
+#       # - $FE_PORT:3000
+#     environment:
+#       TZ: Asia/Tokyo
+#       API_BASE_URL: $API_BASE_URL
+#     environment:
+#       - HOST=0.0.0.0
+#       - API_BASE_URL=$API_BASE_URL
+
+
+
+
+
+
+
 version: '3'
 services:
   mysql:
     container_name: "db"
     image: mysql:8.0.23
-    # image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/be
+    image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/db
     volumes:
       - ./DB/docker/db/data:/var/lib/mysql
       - ./DB/docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
     command: ["--default-authentication-plugin=mysql_native_password"]
     ports:
+      # - 3306:3306
       - $MYSQL_PORT:3306
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
@@ -32,6 +102,7 @@ services:
       - API_BASE_URL=$API_BASE_URL
       - CRYPTOWATCH_URL=$CRYPTOWATCH_URL
     ports:
+      # - 8000:8000
       - $BE_PORT:8000
     working_dir: /usr/src/app/BE
     volumes:
@@ -40,6 +111,7 @@ services:
     tty: true
     stdin_open: true
   fe:
+    image: 354442853189.dkr.ecr.ap-northeast-1.amazonaws.com/bitcoin-demo/fe
     container_name: "fe"
     build:
       context: ./
@@ -49,6 +121,7 @@ services:
     volumes:
       - ./:/usr/src/app
     ports:
+      # - 3000:3000
       - $FE_PORT:3000
     environment:
       TZ: Asia/Tokyo
